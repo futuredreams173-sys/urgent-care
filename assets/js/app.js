@@ -1,5 +1,5 @@
 /* ==========================================================================
-   عناية — وحدة التحكم
+   الرعاية العاجلة — وحدة التحكم
    العروض، التوجيه، الأحداث، وربط الواجهة بالخادم أو بالمخزن المحلي.
    ========================================================================== */
 (function () {
@@ -1423,14 +1423,14 @@
     delete record.token;
     var payload = {
       exportedAt: new Date().toISOString(),
-      application: 'Enaya',
+      application: 'Urgent Care',
       record: record,
     };
     var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     var url = URL.createObjectURL(blob);
     var link = document.createElement('a');
     link.href = url;
-    link.download = 'enaya-record-' + (p.account.masked || 'patient').replace(/•/g, '') + '.json';
+    link.download = 'urgent-care-record-' + (p.account.masked || 'patient').replace(/•/g, '') + '.json';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

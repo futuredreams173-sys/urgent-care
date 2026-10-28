@@ -1,49 +1,55 @@
 /* ==========================================================================
-   عناية — نظام التصميم
+   الرعاية العاجلة — نظام التصميم
    منصة التسجيل الذاتي للمراجعين · RTL أولاً · بلا اعتماديات خارجية
    ========================================================================== */
 
 /* ---------- 1) الرموز (Design Tokens) ---------- */
 :root {
-  /* العلامة */
-  --brand-50:  #F1FAF7;
-  --brand-100: #E1F3EE;
-  --brand-200: #BFE6DC;
-  --brand-300: #8FD2C2;
-  --brand-500: #12A891;
-  --brand-600: #0E8A74;
-  --brand-700: #0A6C5B;
-  --brand-800: #075247;
-  --brand-900: #053830;
+  /* العلامة — تدرّجات بورغندي */
+  --brand-50:  #FCF3F6;
+  --brand-100: #F8E4EB;
+  --brand-200: #EFC8D5;
+  --brand-300: #DCA2B7;
+  --brand-400: #C2748F;
+  --brand-500: #A72C52;
+  --brand-600: #8E2244;
+  --brand-700: #761A36;
+  --brand-800: #5C1229;
+  --brand-900: #400B1C;
+
+  /* تدرّجات العلامة */
+  --grad-brand: linear-gradient(135deg, var(--brand-900) 0%, var(--brand-700) 52%, var(--brand-500) 100%);
+  --grad-brand-2: linear-gradient(160deg, var(--brand-600) 0%, var(--brand-900) 100%);
+  --grad-soft: linear-gradient(150deg, var(--brand-50) 0%, #fff 58%, var(--brand-100) 100%);
 
   /* المحايدات */
-  --ink:      #0C1F1B;
-  --text:     #24352F;
-  --muted:    #5F736D;
-  --faint:    #63756E;
-  --line:     #DFE8E5;
-  --line-2:   #EDF3F1;
+  --ink:      #1B0F14;
+  --text:     #3A2A31;
+  --muted:    #6B5760;
+  --faint:    #6A565F;
+  --line:     #EADCE1;
+  --line-2:   #F4ECEF;
   --surface:  #FFFFFF;
-  --page:     #F4F8F7;
-  --page-2:   #EDF4F2;
+  --page:     #FBF7F8;
+  --page-2:   #F6EEF1;
 
   /* الدلالات */
-  --ok:       #0E8A5F;
-  --ok-bg:    #E6F6EF;
+  --ok:       #0E7A54;
+  --ok-bg:    #E7F6EF;
   --warn:     #8A5A00;
   --warn-bg:  #FFF6E0;
-  --danger:   #B3261E;
+  --danger:   #A8221B;
   --danger-bg:#FDECEA;
   --info:     #1B5E93;
   --info-bg:  #EAF3FB;
   --gold:     #B8873A;
 
   /* الظلال */
-  --sh-xs: 0 1px 2px rgba(9, 40, 34, .06);
-  --sh-sm: 0 2px 8px rgba(9, 40, 34, .06), 0 1px 2px rgba(9, 40, 34, .04);
-  --sh-md: 0 12px 32px -12px rgba(9, 40, 34, .18), 0 2px 8px rgba(9, 40, 34, .05);
-  --sh-lg: 0 32px 64px -28px rgba(9, 40, 34, .28), 0 8px 20px -10px rgba(9, 40, 34, .10);
-  --sh-focus: 0 0 0 4px rgba(18, 168, 145, .18);
+  --sh-xs: 0 1px 2px rgba(64, 11, 28, .06);
+  --sh-sm: 0 2px 8px rgba(64, 11, 28, .06), 0 1px 2px rgba(64, 11, 28, .04);
+  --sh-md: 0 12px 32px -12px rgba(64, 11, 28, .18), 0 2px 8px rgba(64, 11, 28, .05);
+  --sh-lg: 0 32px 64px -28px rgba(64, 11, 28, .28), 0 8px 20px -10px rgba(64, 11, 28, .10);
+  --sh-focus: 0 0 0 4px rgba(167, 44, 82, .18);
 
   /* الأبعاد */
   --r-sm: 10px;
@@ -69,7 +75,11 @@ html {
 
 body {
   margin: 0;
-  background: var(--page);
+  background:
+    radial-gradient(880px 520px at 100% -6%, var(--brand-100) 0%, transparent 62%),
+    radial-gradient(720px 460px at -4% 104%, #F9E7EE 0%, transparent 58%),
+    var(--page);
+  background-repeat: no-repeat;
   color: var(--text);
   font-family: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-size: 16px;
@@ -112,13 +122,15 @@ img { max-width: 100%; display: block; }
 /* ---------- 4) الأزرار ---------- */
 .btn {
   --btn-bg: var(--brand-700);
+  --btn-img: var(--grad-brand-2);
   --btn-fg: #fff;
   --btn-bd: transparent;
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
   padding: 13px 24px;
   border: 1.5px solid var(--btn-bd);
   border-radius: var(--r-md);
-  background: var(--btn-bg);
+  background-color: var(--btn-bg);
+  background-image: var(--btn-img);
   color: var(--btn-fg);
   font-size: 15.5px; font-weight: 600; line-height: 1.3;
   min-height: 48px;
@@ -134,19 +146,19 @@ img { max-width: 100%; display: block; }
 .btn--sm { padding: 9px 16px; font-size: 14px; min-height: 40px; border-radius: var(--r-sm); }
 .btn--block { width: 100%; }
 
-.btn--ghost { --btn-bg: transparent; --btn-fg: var(--brand-800); }
+.btn--ghost { --btn-bg: transparent; --btn-img: none; --btn-fg: var(--brand-800); }
 .btn--ghost:hover { --btn-bg: var(--brand-50); box-shadow: none; }
 
-.btn--outline { --btn-bg: transparent; --btn-fg: var(--brand-800); --btn-bd: var(--brand-200); }
+.btn--outline { --btn-bg: transparent; --btn-img: none; --btn-fg: var(--brand-800); --btn-bd: var(--brand-200); }
 .btn--outline:hover { --btn-bg: var(--brand-50); --btn-bd: var(--brand-300); box-shadow: none; }
 
-.btn--soft { --btn-bg: var(--brand-100); --btn-fg: var(--brand-800); }
+.btn--soft { --btn-bg: var(--brand-100); --btn-img: none; --btn-fg: var(--brand-800); }
 .btn--soft:hover { --btn-bg: var(--brand-200); box-shadow: none; }
 
-.btn--white { --btn-bg: #fff; --btn-fg: var(--brand-800); }
+.btn--white { --btn-bg: #fff; --btn-img: none; --btn-fg: var(--brand-800); }
 .btn--white:hover { --btn-bg: var(--brand-50); }
 
-.btn--danger { --btn-bg: var(--danger); --btn-fg: #fff; }
+.btn--danger { --btn-bg: var(--danger); --btn-img: none; --btn-fg: #fff; }
 
 .btn.is-busy { position: relative; color: transparent !important; }
 .btn.is-busy::after {
@@ -197,7 +209,7 @@ img { max-width: 100%; display: block; }
 .input--code { text-align: center; font-size: 26px; letter-spacing: .5em; padding-inline-start: calc(15px + .5em); font-weight: 600; }
 
 .select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235F736D' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B5760' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 15px center;
   padding-inline-end: 40px;
@@ -269,8 +281,8 @@ html[dir="ltr"] .select {
 .brand__mark {
   width: 40px; height: 40px; border-radius: 12px; flex: none;
   display: grid; place-items: center;
-  background: linear-gradient(150deg, var(--brand-600), var(--brand-800));
-  box-shadow: 0 6px 16px -6px rgba(10,108,91,.55);
+  background: var(--grad-brand-2);
+  box-shadow: 0 6px 16px -6px rgba(118, 26, 54, .5);
 }
 .brand__mark svg { width: 22px; height: 22px; stroke: #fff; stroke-width: 2.6; fill: none; stroke-linecap: round; }
 .brand__name { font-size: 19px; font-weight: 700; letter-spacing: -.01em; color: var(--ink); line-height: 1.1; }
@@ -289,12 +301,15 @@ html[dir="ltr"] .select {
 .top__menu { display: none; }
 
 /* ---------- 8) الواجهة الترحيبية ---------- */
-.hero { position: relative; overflow: hidden; padding-block: 72px 88px; }
+.hero {
+  position: relative; overflow: hidden; padding-block: 72px 88px;
+  background: linear-gradient(175deg, var(--brand-50) 0%, #fff 46%, var(--page) 100%);
+}
 .hero::before {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background:
-    radial-gradient(680px 380px at 88% -8%, rgba(18,168,145,.16), transparent 62%),
-    radial-gradient(560px 340px at 6% 104%, rgba(10,108,91,.10), transparent 60%);
+    radial-gradient(680px 380px at 88% -8%, rgba(167,44,82,.14), transparent 62%),
+    radial-gradient(560px 340px at 6% 104%, rgba(118,26,54,.10), transparent 60%);
 }
 .hero::after {
   content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .5;
@@ -312,7 +327,7 @@ html[dir="ltr"] .select {
   font-size: 12.5px; font-weight: 600; color: var(--brand-800);
   box-shadow: var(--sh-xs);
 }
-.eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px rgba(14,138,95,.16); }
+.eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand-500); box-shadow: 0 0 0 3px rgba(167,44,82,.16); }
 
 .hero h1 {
   margin-top: 20px;
@@ -336,7 +351,7 @@ html[dir="ltr"] .select {
 
 /* بطاقة العرض الجانبية */
 .showcase { position: relative; }
-.showcase__glow { position: absolute; inset: -30px; background: radial-gradient(closest-side, rgba(18,168,145,.18), transparent 70%); filter: blur(8px); pointer-events: none; }
+.showcase__glow { position: absolute; inset: -30px; background: radial-gradient(closest-side, rgba(167,44,82,.18), transparent 70%); filter: blur(8px); pointer-events: none; }
 
 .kiosk-card {
   position: relative; background: #fff; border-radius: var(--r-xl);
@@ -401,15 +416,15 @@ html[dir="ltr"] .select {
 .step-card { position: relative; padding: 28px 26px; background: #fff; border-radius: var(--r-lg); border: 1px solid var(--line); box-shadow: var(--sh-xs); }
 .step-card__n {
   display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px;
-  background: var(--brand-700); color: #fff; font-size: 15px; font-weight: 700;
-  margin-bottom: 16px; box-shadow: 0 8px 18px -8px rgba(10,108,91,.5);
+  background: var(--grad-brand-2); color: #fff; font-size: 15px; font-weight: 700;
+  margin-bottom: 16px; box-shadow: 0 8px 18px -8px rgba(118,26,54,.55);
 }
 .step-card h3 { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 7px; }
 .step-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
 
 .cta-band {
   position: relative; overflow: hidden;
-  background: linear-gradient(135deg, var(--brand-800), var(--brand-700) 55%, var(--brand-600));
+  background: var(--grad-brand);
   border-radius: var(--r-xl); padding: 54px 48px; color: #fff;
   display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;
 }
@@ -433,7 +448,7 @@ html[dir="ltr"] .select {
 .foot__base { margin-top: 34px; padding-top: 20px; border-top: 1px solid var(--line-2); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--faint); }
 
 /* ---------- 11) شاشة الكشك ---------- */
-.kiosk { min-height: 100vh; display: flex; flex-direction: column; background: var(--page); }
+.kiosk { min-height: 100vh; display: flex; flex-direction: column; background: var(--grad-soft); background-attachment: fixed; }
 .kiosk__top { display: flex; align-items: center; gap: 16px; padding-block: 18px; }
 .kiosk__top .top__spacer { flex: 1; }
 .kiosk__body { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding-block: 18px 60px; }
@@ -446,7 +461,7 @@ html[dir="ltr"] .select {
 .progress { display: flex; align-items: center; gap: 6px; margin-bottom: 22px; }
 .progress__step { flex: 1; height: 5px; border-radius: var(--r-pill); background: var(--line); transition: background .3s var(--ease); }
 .progress__step.is-done { background: var(--brand-300); }
-.progress__step.is-on { background: var(--brand-600); }
+.progress__step.is-on { background: linear-gradient(90deg, var(--brand-700), var(--brand-500)); }
 .progress__label { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--faint); }
 .progress__label b { color: var(--brand-700); }
 
@@ -502,7 +517,7 @@ html[dir="ltr"] .select {
 .portal { min-height: 100vh; display: flex; flex-direction: column; }
 
 .portal__hero {
-  background: linear-gradient(135deg, var(--brand-800), var(--brand-700));
+  background: var(--grad-brand);
   color: #fff; padding-block: 34px 30px; position: relative; overflow: hidden;
 }
 .portal__hero::after {
@@ -601,7 +616,7 @@ html[dir="ltr"] .select {
 
 /* ---------- 14) النافذة ---------- */
 .modal { position: fixed; inset: 0; z-index: 130; display: grid; place-items: center; padding: 20px; }
-.modal__scrim { position: absolute; inset: 0; background: rgba(6, 30, 26, .48); backdrop-filter: blur(3px); animation: fade .2s ease; }
+.modal__scrim { position: absolute; inset: 0; background: rgba(45, 8, 22, .5); backdrop-filter: blur(3px); animation: fade .2s ease; }
 .modal__card {
   position: relative; width: min(560px, 100%); max-height: min(86vh, 720px);
   display: flex; flex-direction: column;
@@ -650,6 +665,23 @@ html[dir="ltr"] .select {
 
 @media (max-width: 520px) {
   .top__cta { display: none; }
+  .top__in { gap: 10px; }
+  .top__actions { gap: 4px; }
+  .brand { gap: 8px; min-width: 0; }
+  .brand__mark { width: 36px; height: 36px; border-radius: 10px; }
+  .brand__name { font-size: 16px; white-space: nowrap; }
+  .brand__tag { display: none; }
+  .iconbtn { width: 38px; height: 38px; }
+  .chip { font-size: 11.5px; padding: 5px 10px; }
+  .kiosk__top { gap: 8px; }
+  .hero h1 { font-size: clamp(1.6rem, 7.2vw, 2.2rem); }
+  .hero__lead { font-size: 16px; }
+}
+
+@media (max-width: 400px) {
+  .brand__name { font-size: 15px; }
+  .brand__mark { width: 32px; height: 32px; }
+  .brand__mark svg { width: 18px; height: 18px; }
 }
 
 @media (max-width: 640px) {

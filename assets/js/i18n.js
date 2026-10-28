@@ -1,13 +1,13 @@
 /* ==========================================================================
-   عناية — الترجمة (عربي / إنجليزي)
+   الرعاية العاجلة — الترجمة (عربي / إنجليزي)
    ========================================================================== */
 (function (global) {
   'use strict';
 
   var DICT = {
     ar: {
-      brand: 'عناية',
-      brandTag: 'الرعاية الصحية المتكاملة',
+      brand: 'الرعاية العاجلة',
+      brandTag: 'رعاية عاجلة على مدار الساعة',
       langToggle: 'English',
       langTitle: 'تبديل اللغة',
 
@@ -16,9 +16,9 @@
       navPortal: 'بوابة المريض',
 
       heroBadge: 'التسجيل الذاتي متاح الآن',
-      heroTitleA: 'سجّل زيارتك في',
-      heroTitleEm: 'دقيقة واحدة',
-      heroLead: 'منصة «عناية» تتيح لك تسجيل بياناتك بنفسك، واستلام رقم الانتظار فوراً، ومتابعة ملفك الصحي في مكان واحد — بخصوصية تامة ودون انتظار في الاستقبال.',
+      heroTitleA: 'رعاية عاجلة',
+      heroTitleEm: 'عندما تحتاجها',
+      heroLead: 'منصة «الرعاية العاجلة» تتيح لك تسجيل بياناتك بنفسك، واستلام رقم الانتظار فوراً، ومتابعة ملفك الطبي في مكان واحد — بخصوصية تامة ودون انتظار في الاستقبال.',
       heroCta1: 'ابدأ التسجيل',
       heroCta2: 'دخول المرضى',
       trust1t: 'رقم انتظار فوري',
@@ -35,7 +35,7 @@
       showNote: 'ملفك مشفّر على جهازك',
       showNoteSub: 'لا يستطيع أي مستخدم آخر فتحه',
 
-      featTitle: 'لماذا عناية؟',
+      featTitle: 'لماذا الرعاية العاجلة؟',
       featLead: 'تجربة تسجيل مصمّمة بمعايير المنشآت الصحية العالمية: بسيطة للمراجع، وآمنة لبياناته.',
       feat1t: 'تسجيل بلا انتظار',
       feat1d: 'ثلاث خطوات فقط لاستلام رقم الانتظار، مع تحقق فوري من صحة البيانات قبل الحفظ.',
@@ -55,7 +55,7 @@
       how3d: 'يظهر رقم الانتظار فوراً مع حالة الإرسال إلى رقيم وصحتي.',
 
       ctaTitle: 'جاهز لتبدأ؟',
-      ctaLead: 'التسجيل يستغرق أقل من دقيقة، ويمكنك متابعة ملفك من أي جهاز لاحقاً.',
+      ctaLead: 'التسجيل بخطوات قليلة، ويمكنك متابعة ملفك من أي جهاز لاحقاً.',
       ctaBtn: 'سجّل الآن',
 
       footAbout: 'منصة تسجيل ذاتي للمراجعين، مبنية على واجهة حديثة وخادم آمن، مع الحفاظ الكامل على خصوصية البيانات.',
@@ -229,8 +229,8 @@
     },
 
     en: {
-      brand: 'Enaya',
-      brandTag: 'Integrated Healthcare',
+      brand: 'Urgent Care',
+      brandTag: 'Round-the-clock urgent care',
       langToggle: 'العربية',
       langTitle: 'Switch language',
 
@@ -239,9 +239,9 @@
       navPortal: 'Patient portal',
 
       heroBadge: 'Self-registration is open',
-      heroTitleA: 'Register your visit in',
-      heroTitleEm: 'one minute',
-      heroLead: 'Enaya lets you check in yourself, receive your queue number instantly, and follow your health record in one place — privately, with no reception queue.',
+      heroTitleA: 'Urgent care',
+      heroTitleEm: 'when you need it',
+      heroLead: 'Urgent Care lets you check in yourself, receive your queue number instantly, and follow your medical record in one place — privately, with no reception queue.',
       heroCta1: 'Start registration',
       heroCta2: 'Patient sign-in',
       trust1t: 'Instant queue number',
@@ -258,7 +258,7 @@
       showNote: 'Your record is encrypted',
       showNoteSub: 'No other user can open it',
 
-      featTitle: 'Why Enaya?',
+      featTitle: 'Why Urgent Care?',
       featLead: 'A registration experience built to global healthcare standards: simple for the patient, safe for the data.',
       feat1t: 'No waiting',
       feat1d: 'Three steps to your queue number, with instant validation before anything is stored.',
@@ -278,7 +278,7 @@
       how3d: 'Your queue number appears instantly with the Raqeem and Sehhaty status.',
 
       ctaTitle: 'Ready to start?',
-      ctaLead: 'Registration takes under a minute, and you can open your record from any device later.',
+      ctaLead: 'Registration takes a few steps, and you can open your record from any device later.',
       ctaBtn: 'Register now',
 
       footAbout: 'A patient self-registration platform built on a modern interface and a secure server, with full data privacy.',
