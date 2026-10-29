@@ -32,8 +32,8 @@
       showSync: 'حالة المزامنة',
       showOk: 'تم',
       showWait: 'قيد الانتظار',
-      showNote: 'ملفك مشفّر على جهازك',
-      showNoteSub: 'لا يستطيع أي مستخدم آخر فتحه',
+      showNote: 'ملفك محمي',
+      showNoteSub: 'محفوظ في حسابك ولا يطّلع عليه غيرك',
 
       featTitle: 'لماذا الرعاية العاجلة؟',
       featLead: 'تجربة تسجيل مصمّمة بمعايير المنشآت الصحية العالمية: بسيطة للمراجع، وآمنة لبياناته.',
@@ -127,8 +127,8 @@
       loginTitle: 'بوابة المريض',
       loginSub: 'ادخل برقم وثيقتك ورمز الدخول لعرض ملفك الصحي',
       loginBtn: 'دخول',
-      loginNoVault: 'لا يوجد ملف محفوظ على هذا الجهاز لهذه الوثيقة. سجّل زيارتك أولاً أو اتصل بالخادم.',
-      loginHint: 'ملفك مشفّر على جهازك، ولا يمكن لأي مستخدم آخر فتحه.',
+      loginNoVault: 'لا يوجد ملف سحابي لهذه الوثيقة. سجّل زيارتك أولاً ثم حاول مرة أخرى.',
+      loginHint: 'ملفك محفوظ في حسابك السحابي، ولا يُفتح إلا برمز الدخول الخاص بك.',
 
       greeting: 'أهلاً بك',
       memberSince: 'مراجع منذ',
@@ -165,7 +165,7 @@
       stCancelled: 'ملغاة',
 
       notesTitle: 'ملاحظاتي الخاصة',
-      notesSub: 'تُحفظ مشفّرة على جهازك فقط — لا تُرسل إلى أي خادم.',
+      notesSub: 'محفوظة في حسابك السحابي ومشفّرة قبل الإرسال — لا يراها غيرك.',
       addNote: 'إضافة ملاحظة',
       noNotes: 'لا توجد ملاحظات',
       noNotesSub: 'أضف ملاحظة خاصة بك، مثل تذكير بموعد أو سؤال للطبيب.',
@@ -173,6 +173,9 @@
       noteBody: 'النص',
       noteTitlePh: 'مثال: أسئلة قبل الموعد',
       noteBodyPh: 'اكتب ملاحظتك هنا…',
+      noteEdited: 'معدّلة',
+      editNote: 'تعديل الملاحظة',
+      edit: 'تعديل',
       exportVault: 'تصدير نسخة من ملفي',
 
       cancel: 'إلغاء',
@@ -190,11 +193,16 @@
       confirmYes: 'نعم، احذف',
 
       offlineTitle: 'الخادم غير متصل',
-      offlineBody: 'تم حفظ بياناتك مشفّرة على هذا الجهاز فقط، ولم تُرسل إلى رقيم أو صحتي. شغّل خادم المنصة لتفعيل المزامنة.',
+      offlineBody: 'حُفظت بياناتك في حسابك السحابي، لكن تعذّر إرسالها إلى رقيم أو صحتي. شغّل خادم المنصة لتفعيل المزامنة.',
       offlineChip: 'وضع محلي',
       online: 'متصل',
       checking: 'جارٍ التحقق…',
       menu: 'القائمة',
+
+      cloudOnline: 'سحابة متصلة',
+      cloudDemo: 'وضع تجريبي',
+      cloudDemoHint: 'لم تُضف مفاتيح Supabase بعد؛ البيانات في الذاكرة فقط ولا تُحفظ.',
+      cloudOff: 'غير مهيأ',
 
       errRequired: 'هذا الحقل مطلوب',
       errNid: 'رقم الهوية 10 أرقام ويبدأ بـ 1',
@@ -214,10 +222,20 @@
       errServer: 'تعذّر الاتصال بالخادم. تحقق من التشغيل أو الشبكة.',
       errGeneric: 'حدث خطأ غير متوقع. حاول مرة أخرى.',
       errNoCrypto: 'متصفحك لا يدعم التشفير المطلوب. استخدم متصفحاً حديثاً.',
+      errCloud: 'تعذّر الوصول إلى السحابة. تحقق من الشبكة ثم حاول مرة أخرى.',
+      errCloudConfig: 'لم تُضف إعدادات Supabase بعد. ضع الرابط والمفتاح العام في assets/js/supabase-config.js.',
+      errCloudLib: 'تعذّر تحميل مكتبة Supabase من الشبكة. تحقق من الاتصال ثم أعد تحميل الصفحة.',
+      errCloudDenied: 'لا تملك صلاحية الوصول إلى هذا الملف.',
+      errCloudRate: 'محاولات كثيرة خلال وقت قصير. انتظر قليلاً ثم حاول مرة أخرى.',
+      errCloudOff: 'طبقة السحابة لم تُحمّل. أعد تحميل الصفحة أو تحقق من ملفات JavaScript.',
+      errSession: 'انتهت الجلسة. سجّل الدخول مرة أخرى.',
+      errEmailConfirm: 'تأكيد البريد مفعّل في Supabase. عطّل «Confirm email» لمزوّد البريد حتى يعمل تسجيل المرضى.',
+      errAccountExists: 'هذه الوثيقة مسجّلة مسبقاً برمز دخول مختلف. استخدم رمز الدخول الصحيح أو تواصل مع الاستقبال.',
 
       copied: 'تم النسخ',
       saved: 'تم الحفظ',
       noteAdded: 'أُضيفت الملاحظة',
+      noteUpdated: 'حُدّثت الملاحظة',
       noteDeleted: 'حُذفت الملاحظة',
       exported: 'تم تصدير الملف',
       registered: 'تم التسجيل بنجاح',
@@ -255,8 +273,8 @@
       showSync: 'Sync status',
       showOk: 'Done',
       showWait: 'Pending',
-      showNote: 'Your record is encrypted',
-      showNoteSub: 'No other user can open it',
+      showNote: 'Your record is protected',
+      showNoteSub: 'Stored in your account; nobody else can access it',
 
       featTitle: 'Why Urgent Care?',
       featLead: 'A registration experience built to global healthcare standards: simple for the patient, safe for the data.',
@@ -350,8 +368,8 @@
       loginTitle: 'Patient portal',
       loginSub: 'Sign in with your document number and access code',
       loginBtn: 'Sign in',
-      loginNoVault: 'No record found on this device for this document. Register first or connect to the server.',
-      loginHint: 'Your record is encrypted on this device and cannot be opened by anyone else.',
+      loginNoVault: 'No cloud record exists for this document. Register your visit first, then try again.',
+      loginHint: 'Your record lives in your cloud account and opens only with your access code.',
 
       greeting: 'Welcome',
       memberSince: 'Patient since',
@@ -388,7 +406,7 @@
       stCancelled: 'Cancelled',
 
       notesTitle: 'Private notes',
-      notesSub: 'Stored encrypted on your device only — never sent to any server.',
+      notesSub: 'Stored in your cloud account and encrypted before upload — only you can read them.',
       addNote: 'Add note',
       noNotes: 'No notes yet',
       noNotesSub: 'Add a private note, such as a reminder or a question for your doctor.',
@@ -396,6 +414,9 @@
       noteBody: 'Text',
       noteTitlePh: 'e.g. Questions before my appointment',
       noteBodyPh: 'Write your note here…',
+      noteEdited: 'edited',
+      editNote: 'Edit note',
+      edit: 'Edit',
       exportVault: 'Export a copy of my record',
 
       cancel: 'Cancel',
@@ -413,11 +434,16 @@
       confirmYes: 'Yes, delete',
 
       offlineTitle: 'Server not connected',
-      offlineBody: 'Your data was saved encrypted on this device only and was not sent to Raqeem or Sehhaty. Start the platform server to enable sync.',
+      offlineBody: 'Your data was saved to your cloud account, but it could not be sent to Raqeem or Sehhaty. Start the platform server to enable sync.',
       offlineChip: 'Local mode',
       online: 'Online',
       checking: 'Checking…',
       menu: 'Menu',
+
+      cloudOnline: 'Cloud connected',
+      cloudDemo: 'Demo mode',
+      cloudDemoHint: 'Supabase keys are not set; data lives in memory only and is not saved.',
+      cloudOff: 'Not configured',
 
       errRequired: 'This field is required',
       errNid: 'National ID is 10 digits starting with 1',
@@ -437,10 +463,20 @@
       errServer: 'Could not reach the server. Check that it is running.',
       errGeneric: 'Something went wrong. Please try again.',
       errNoCrypto: 'Your browser does not support the required encryption. Use a modern browser.',
+      errCloud: 'Could not reach the cloud. Check your connection and try again.',
+      errCloudConfig: 'Supabase is not configured yet. Add the project URL and public key in assets/js/supabase-config.js.',
+      errCloudLib: 'Could not load the Supabase library. Check your connection and reload the page.',
+      errCloudDenied: 'You do not have permission to access this record.',
+      errCloudRate: 'Too many attempts in a short time. Wait a moment and try again.',
+      errCloudOff: 'The cloud layer did not load. Reload the page or check the JavaScript files.',
+      errSession: 'Your session expired. Please sign in again.',
+      errEmailConfirm: 'Email confirmation is enabled in Supabase. Disable “Confirm email” for the email provider so patient registration can work.',
+      errAccountExists: 'This document is already registered with a different access code. Use the correct code or contact reception.',
 
       copied: 'Copied',
       saved: 'Saved',
       noteAdded: 'Note added',
+      noteUpdated: 'Note updated',
       noteDeleted: 'Note deleted',
       exported: 'Record exported',
       registered: 'Registered successfully',
@@ -466,17 +502,18 @@
     eDocType: 'errDocType',
     eCategory: 'errCategory',
     eTooLong: 'errTooLong',
+    INVALID_PIN: 'errInvalidPin',
+    NOT_FOUND: 'loginNoVault',
+    ACCOUNT_EXISTS: 'errAccountExists',
+    EMAIL_NOT_CONFIRMED: 'errEmailConfirm',
+    CLOUD_NOT_CONFIGURED: 'errCloudConfig',
+    CLOUD_LIB_MISSING: 'errCloudLib',
+    CLOUD_DENIED: 'errCloudDenied',
+    CLOUD_RATE_LIMIT: 'errCloudRate',
+    SESSION_EXPIRED: 'errSession',
   };
 
-  var STORAGE_KEY = 'enaya:lang';
   var lang = 'ar';
-
-  try {
-    var saved = global.localStorage.getItem(STORAGE_KEY);
-    if (saved === 'ar' || saved === 'en') lang = saved;
-  } catch (error) {
-    /* التخزين غير متاح — الافتراضي العربية */
-  }
 
   function t(key) {
     var pack = DICT[lang] || DICT.ar;
@@ -494,11 +531,6 @@
 
   function setLang(next) {
     lang = next === 'en' ? 'en' : 'ar';
-    try {
-      global.localStorage.setItem(STORAGE_KEY, lang);
-    } catch (error) {
-      /* تجاهل */
-    }
     return lang;
   }
 

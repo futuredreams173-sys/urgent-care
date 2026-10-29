@@ -24,3 +24,22 @@ server/data/
 *.db
 *.db-wal
 *.db-shm
+
+# ============================================================================
+# Supabase — أسرار لا تُرفع أبداً
+# المفتاح العام (anon / publishable) فقط هو المسموح في الواجهة.
+# لا تضع service_role أو أي مفتاح سري في assets/js/supabase-config.js
+# ============================================================================
+.env
+.env.*
+*.env
+supabase/.env
+supabase/.env.*
+supabase-config.local.js
+assets/js/supabase-config.local.js
+supabase-config.secret.js
+assets/js/supabase-config.secret.js
+*service-role*
+*service_role*
+secrets/
+

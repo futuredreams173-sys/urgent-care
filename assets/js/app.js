@@ -1,13 +1,13 @@
 /* ==========================================================================
    الرعاية العاجلة — وحدة التحكم
-   العروض، التوجيه، الأحداث، وربط الواجهة بالخادم أو بالمخزن المحلي.
+   العروض، التوجيه، الأحداث، وربط الواجهة بالسحابة (Supabase) أو بالخادم.
    ========================================================================== */
 (function () {
   'use strict';
 
   var T = window.EnayaI18n;
   var C = window.EnayaCrypto;
-  var Store = window.EnayaStore;
+  var Cloud = window.UrgentCloud;
   var Api = window.EnayaApi;
 
   var t = T.t;
@@ -222,13 +222,13 @@
   }
 
   function connectionChip() {
-    if (!Api.checked) {
-      return '<span class="chip" id="connChip">' + esc(t('checking')) + '</span>';
+    if (!Cloud) {
+      return '<span class="chip chip--fail" id="connChip"><i class="dot"></i>' + esc(t('cloudOff')) + '</span>';
     }
-    if (Api.online) {
-      return '<span class="chip chip--ok" id="connChip"><i class="dot"></i>' + esc(t('online')) + '</span>';
+    if (Cloud.isDemo) {
+      return '<span class="chip chip--warn" id="connChip" title="' + esc(t('cloudDemoHint')) + '"><i class="dot"></i>' + esc(t('cloudDemo')) + '</span>';
     }
-    return '<span class="chip chip--warn" id="connChip"><i class="dot"></i>' + esc(t('offlineChip')) + '</span>';
+    return '<span class="chip chip--ok" id="connChip"><i class="dot"></i>' + esc(t('cloudOnline')) + '</span>';
   }
 
   function toggleMenu() {
@@ -673,6 +673,7 @@
       '<p style="margin-top:6px;color:var(--muted);font-size:14.5px">' + esc(t('loginSub')) + '</p>' +
       '</div>' +
       (l.error ? '<div class="notice notice--danger" style="margin-bottom:18px">' + icon('alert', 'ic') + '<div>' + esc(errText(l.error)) + '</div></div>' : '') +
+      (Cloud.isDemo ? '<div class="notice notice--warn" style="margin-bottom:18px">' + icon('info', 'ic') + '<div>' + esc(t('cloudDemoHint')) + '</div></div>' : '') +
       '<div class="field"><label for="lgType">' + esc(t('docType')) + '</label>' +
       '<select class="select" id="lgType">' +
       ['nid', 'iqama', 'passport']
@@ -835,6 +836,12 @@
     return '<div class="visit-list">' + visits.map(visitRow).join('') + '</div>';
   }
 
+  function wasEdited(note) {
+    var created = new Date(note.createdAt).getTime();
+    var updated = new Date(note.updatedAt).getTime();
+    return isFinite(created) && isFinite(updated) && (updated - created) > 1500;
+  }
+
   function portalNotes(notes) {
     var list = notes.length
       ? '<div class="grid" style="gap:12px">' +
@@ -846,9 +853,13 @@
               '<div style="flex:1;min-width:0">' +
               '<b style="display:block;font-size:14.5px;color:var(--ink)">' + esc(note.title) + '</b>' +
               '<p style="margin-top:4px;font-size:13.5px;color:var(--muted);white-space:pre-wrap">' + esc(note.body) + '</p>' +
-              '<span style="display:block;margin-top:8px;font-size:11.5px;color:var(--faint)">' + esc(formatDate(note.createdAt)) + '</span>' +
+              '<span style="display:block;margin-top:8px;font-size:11.5px;color:var(--faint)">' + esc(formatDate(wasEdited(note) ? note.updatedAt : note.createdAt)) +
+              (wasEdited(note) ? ' · ' + esc(t('noteEdited')) : '') + '</span>' +
               '</div>' +
+              '<div style="display:flex;gap:4px;flex:none">' +
+              '<button class="iconbtn" type="button" data-act="edit-note" data-id="' + esc(note.id) + '" aria-label="' + esc(t('edit')) + '">' + icon('edit') + '</button>' +
               '<button class="iconbtn" type="button" data-act="delete-note" data-id="' + esc(note.id) + '" aria-label="' + esc(t('delete')) + '">' + icon('trash') + '</button>' +
+              '</div>' +
               '</div></div></article>'
             );
           })
@@ -1068,17 +1079,6 @@
     return mapped;
   }
 
-  function buildVault(profile, visits, token, mode) {
-    return {
-      profile: profile,
-      visits: visits || [],
-      notes: [],
-      token: token || null,
-      mode: mode || 'local',
-      updatedAt: new Date().toISOString(),
-    };
-  }
-
   function profileFromPayload(payload, masked, createdAt) {
     return {
       docType: payload.documentType,
@@ -1093,54 +1093,25 @@
     };
   }
 
-  function mergeVisits(existing, incoming) {
-    var byId = {};
-    (existing || []).forEach(function (visit) { byId[visit.id] = visit; });
-    (incoming || []).forEach(function (visit) {
-      if (visit && visit.id) {
-        var previous = byId[visit.id];
-        byId[visit.id] = Object.assign({}, previous, visit);
-      }
-    });
-    return Object.keys(byId)
-      .map(function (id) { return byId[id]; })
-      .sort(function (a, b) { return String(b.createdAt).localeCompare(String(a.createdAt)); });
-  }
+  /**
+   * يحفظ التسجيل في السحابة: ينشئ حساب الدخول إن لم يكن موجوداً،
+   * ثم يرفع بيانات المريض والزيارة. يعيد الملف الكامل بعد الحفظ.
+   */
+  async function persistCloud(payload, patient, visit, token, mode) {
+    var profile = profileFromPayload(
+      payload,
+      patient ? patient.maskedDocumentNumber : C.mask(payload.documentNumber),
+      patient ? patient.createdAt : null
+    );
 
-  async function persistLocal(payload, patient, visit, token, mode) {
-    var existing = await Store.findAccount(payload.documentType, payload.documentNumber);
-
-    if (existing) {
-      var opened = await Store.unlock(existing, payload.pin);
-      var profile = Object.assign(
-        profileFromPayload(payload, existing.masked, opened.data.profile ? opened.data.profile.createdAt : null),
-        patient ? { masked: patient.maskedDocumentNumber } : {}
-      );
-      var data = {
-        profile: Object.assign({}, opened.data.profile || {}, profile),
-        visits: mergeVisits(opened.data.visits, visit ? [visit] : []),
-        notes: opened.data.notes || [],
-        token: token || opened.data.token || null,
-        mode: mode,
-        updatedAt: new Date().toISOString(),
-      };
-      await Store.save(existing, opened.key, data);
-      return { account: existing, key: opened.key, data: data };
-    }
-
-    var created = await Store.createAccount({
+    return Cloud.register({
       docType: payload.documentType,
       docNumber: payload.documentNumber,
       pin: payload.pin,
-      data: buildVault(
-        profileFromPayload(payload, patient ? patient.maskedDocumentNumber : C.mask(payload.documentNumber), patient ? patient.createdAt : null),
-        visit ? [visit] : [],
-        token,
-        mode
-      ),
+      profile: profile,
+      visit: visit,
+      mode: mode,
     });
-
-    return created;
   }
 
   async function submitRegistration() {
@@ -1190,7 +1161,7 @@
           ? Object.assign({}, visitResponse.visit, { sync: visitResponse.sync })
           : null;
 
-        var session = await persistLocal(
+        var session = await persistCloud(
           payload,
           registration.patient,
           visit,
@@ -1199,7 +1170,7 @@
         );
 
         k.result = {
-          queueNumber: visit ? visit.queueNumber : '—',
+          queueNumber: visit ? visit.queueNumber : (session.visit ? session.visit.queueNumber : '—'),
           sync: visitResponse ? visitResponse.sync : {},
           offline: false,
         };
@@ -1211,7 +1182,7 @@
         return;
       }
 
-      // ─── وضع محلي (لا يوجد خادم) ───
+      // ─── وضع بلا خادم: رقم انتظار محلي + حفظ سحابي ───
       var errors = localCheck(payload);
       if (Object.keys(errors).length) {
         k.errors = errors;
@@ -1221,15 +1192,14 @@
       }
 
       var localVisit = {
-        id: 'local-' + Date.now().toString(36),
-        queueNumber: 101,
+        queueNumber: null,
         status: 'waiting',
         reason: null,
         createdAt: new Date().toISOString(),
         sync: {},
       };
 
-      var localSession = await persistLocal(
+      var localSession = await persistCloud(
         payload,
         null,
         localVisit,
@@ -1237,11 +1207,8 @@
         'local'
       );
 
-      localSession.data.visits = mergeVisits(localSession.data.visits, [localVisit]);
-      localVisit.queueNumber = 100 + localSession.data.visits.length;
-      await Store.save(localSession.account, localSession.key, localSession.data);
-
-      k.result = { queueNumber: localVisit.queueNumber, sync: {}, offline: true };
+      var savedVisit = localSession.visit || localVisit;
+      k.result = { queueNumber: savedVisit.queueNumber, sync: {}, offline: true };
       k.session = localSession;
       k.busy = false;
       k.step = 4;
@@ -1272,71 +1239,11 @@
     render();
 
     try {
-      var account = await Store.findAccount(l.docType, l.docNo);
-
-      if (account) {
-        try {
-          var opened = await Store.unlock(account, l.pin);
-          l.busy = false;
-          l.pin = '';
-          openPortal(account, opened.key, opened.data);
-          return;
-        } catch (error) {
-          l.busy = false;
-          l.error = 'errInvalidPin';
-          render();
-          return;
-        }
-      }
-
-      if (!Api.checked) await Api.init();
-
-      if (!Api.online) {
-        l.busy = false;
-        l.error = 'loginNoVault';
-        render();
-        return;
-      }
-
-      var response;
-      try {
-        response = await Api.resume(l.docType, l.docNo, l.pin);
-      } catch (error) {
-        l.busy = false;
-        l.error = error.code === 'INVALID_PIN' ? 'errInvalidPin'
-          : error.code === 'PATIENT_NOT_FOUND' ? 'loginNoVault'
-            : error.code || 'errGeneric';
-        render();
-        return;
-      }
-
-      var created = await Store.createAccount({
-        docType: l.docType,
-        docNumber: l.docNo,
-        pin: l.pin,
-        data: buildVault(
-          profileFromPayload(
-            {
-              documentType: l.docType,
-              documentNumber: l.docNo,
-              phone: response.patient.phone,
-              category: response.patient.category,
-              birthDate: response.patient.birthDate,
-              insurer: response.patient.insurer,
-              policyNumber: response.patient.policyNumber,
-            },
-            response.patient.maskedDocumentNumber,
-            response.patient.createdAt
-          ),
-          response.visits || [],
-          response.token,
-          'online'
-        ),
-      });
+      var session = await Cloud.login(l.docType, l.docNo, l.pin);
 
       l.busy = false;
       l.pin = '';
-      openPortal(created.account, created.key, created.data);
+      openPortal(session.account, session.data);
     } catch (error) {
       l.busy = false;
       l.error = error && error.code ? error.code : 'errGeneric';
@@ -1344,30 +1251,25 @@
     }
   }
 
-  function openPortal(account, key, data) {
-    state.portal = { account: account, key: key, data: data, tab: 'overview' };
+  function openPortal(account, data) {
+    state.portal = { account: account, data: data, tab: 'overview' };
     state.screen = 'portal';
     render();
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
-  async function saveVault(changes) {
-    var p = state.portal;
-    if (!p) return;
-    p.data = await Store.patch(p.account, p.key, p.data, changes);
-    render();
-  }
-
   // ─── الملاحظات ──────────────────────────────────────────────────────────────
 
-  function addNoteDialog() {
+  function noteDialog(note) {
+    var editing = !!note;
+
     openModal({
-      title: t('addNote'),
+      title: t(editing ? 'editNote' : 'addNote'),
       body:
         '<div class="field"><label for="ntTitle">' + esc(t('noteTitle')) + '</label>' +
-        '<input class="input" id="ntTitle" maxlength="80" placeholder="' + esc(t('noteTitlePh')) + '"></div>' +
+        '<input class="input" id="ntTitle" maxlength="80" value="' + esc(editing ? note.title : '') + '" placeholder="' + esc(t('noteTitlePh')) + '"></div>' +
         '<div class="field"><label for="ntBody">' + esc(t('noteBody')) + '</label>' +
-        '<textarea class="input" id="ntBody" rows="5" maxlength="2000" style="resize:vertical" placeholder="' + esc(t('noteBodyPh')) + '"></textarea></div>',
+        '<textarea class="input" id="ntBody" rows="5" maxlength="2000" style="resize:vertical" placeholder="' + esc(t('noteBodyPh')) + '">' + esc(editing ? note.body : '') + '</textarea></div>',
       actions: [
         { label: t('cancel'), variant: 'btn--ghost' },
         {
@@ -1377,21 +1279,43 @@
             var title = ($('#ntTitle').value || '').trim();
             var body = ($('#ntBody').value || '').trim();
             if (!title && !body) return;
-            var p = state.portal;
-            var notes = (p.data.notes || []).slice();
-            notes.unshift({
-              id: 'n_' + Date.now().toString(36),
-              title: title || t('noteBody'),
-              body: body,
-              createdAt: new Date().toISOString(),
-            });
-            saveVault({ notes: notes }).then(function () {
-              toast(t('noteAdded'), 'ok');
-            });
+
+            var promise = editing
+              ? Cloud.updateNote(note.id, title, body)
+              : Cloud.addNote(title, body);
+
+            promise
+              .then(function (saved) {
+                var p = state.portal;
+                if (!p) return;
+                var notes = (p.data.notes || []).slice();
+                if (editing) {
+                  notes = notes.map(function (item) { return item.id === saved.id ? saved : item; });
+                } else {
+                  notes.unshift(saved);
+                }
+                p.data.notes = notes;
+                render();
+                toast(t(editing ? 'noteUpdated' : 'noteAdded'), 'ok');
+              })
+              .catch(function (error) {
+                toast(errText(error && error.code ? error.code : 'errGeneric'), 'err');
+              });
           },
         },
       ],
     });
+  }
+
+  function addNoteDialog() {
+    noteDialog(null);
+  }
+
+  function editNoteDialog(id) {
+    var p = state.portal;
+    if (!p) return;
+    var note = (p.data.notes || []).filter(function (item) { return item.id === id; })[0];
+    if (note) noteDialog(note);
   }
 
   function deleteNoteDialog(id) {
@@ -1404,11 +1328,17 @@
           label: t('confirmYes'),
           variant: 'btn--danger',
           onClick: function () {
-            var p = state.portal;
-            var notes = (p.data.notes || []).filter(function (note) { return note.id !== id; });
-            saveVault({ notes: notes }).then(function () {
-              toast(t('noteDeleted'), 'ok');
-            });
+            Cloud.deleteNote(id)
+              .then(function () {
+                var p = state.portal;
+                if (!p) return;
+                p.data.notes = (p.data.notes || []).filter(function (note) { return note.id !== id; });
+                render();
+                toast(t('noteDeleted'), 'ok');
+              })
+              .catch(function (error) {
+                toast(errText(error && error.code ? error.code : 'errGeneric'), 'err');
+              });
           },
         },
       ],
@@ -1534,7 +1464,7 @@
       var session = state.kiosk.session;
       if (session) {
         state.kiosk = freshKiosk();
-        openPortal(session.account, session.key, session.data);
+        openPortal(session.account, session.data);
       } else {
         go('login');
       }
@@ -1547,6 +1477,7 @@
     }
 
     if (act === 'logout') {
+      Cloud.logout();
       state.portal = null;
       state.login = { docType: 'nid', docNo: '', pin: '', error: '', busy: false };
       go('home');
@@ -1556,11 +1487,29 @@
     if (act === 'tab') {
       state.portal.tab = trigger.getAttribute('data-tab');
       render();
+
+      // جلب أحدث الملاحظات من السحابة عند فتح تبويب الملاحظات.
+      if (state.portal.tab === 'notes') {
+        Cloud.refresh()
+          .then(function (data) {
+            if (!state.portal || state.portal.tab !== 'notes') return;
+            state.portal.data = data;
+            render();
+          })
+          .catch(function (error) {
+            toast(errText(error && error.code ? error.code : 'errCloud'), 'err');
+          });
+      }
       return;
     }
 
     if (act === 'add-note') {
       addNoteDialog();
+      return;
+    }
+
+    if (act === 'edit-note') {
+      editNoteDialog(trigger.getAttribute('data-id'));
       return;
     }
 
@@ -1597,19 +1546,21 @@
       return;
     }
 
+    if (!Cloud) {
+      $('#app').innerHTML =
+        '<div class="wrap" style="max-width:560px;padding-block:120px">' +
+        '<div class="notice notice--danger">' + icon('alert', 'ic') + '<div>' + esc(t('errCloudOff')) + '</div></div></div>';
+      return;
+    }
+
     render();
 
-    Api.init().then(function () {
-      var chips = document.querySelectorAll('#connChip');
-      if (!chips.length) return;
-      var wrapper = document.createElement('div');
-      wrapper.innerHTML = connectionChip();
-      var fresh = wrapper.firstElementChild;
-      for (var i = 0; i < chips.length; i += 1) {
-        var node = chips[i];
-        if (node.parentNode) node.parentNode.replaceChild(fresh.cloneNode(true), node);
-      }
-    });
+    var cloudInfo = Cloud.init();
+    if (cloudInfo.mode === 'demo' && window.console && window.console.info) {
+      window.console.info('[urgent-care] Supabase غير مهيّأ: يعمل التطبيق في وضع تجريبي داخل الذاكرة فقط. أضف url و anonKey في assets/js/supabase-config.js.');
+    }
+
+    Api.init();
   }
 
   if (document.readyState === 'loading') {
