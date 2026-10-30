@@ -102,6 +102,9 @@
 
     if (message.indexOf('invalid login credentials') >= 0) return apiError('INVALID_PIN');
     if (message.indexOf('email not confirmed') >= 0) return apiError('EMAIL_NOT_CONFIRMED');
+    if (message.indexOf('email address') >= 0 && message.indexOf('invalid') >= 0) {
+      return apiError('EMAIL_DOMAIN_INVALID');
+    }
     if (message.indexOf('already registered') >= 0 || message.indexOf('already been registered') >= 0) {
       return apiError('ACCOUNT_EXISTS');
     }

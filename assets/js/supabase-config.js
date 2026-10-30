@@ -12,11 +12,11 @@
   'use strict';
 
   global.URGENT_CARE_SUPABASE = {
-    // مثال: https://abcdefghijklmnop.supabase.co
-    url: '',
+    // مشروع Supabase الخاص بالمنصة (مفتاح عام فقط — لا أسرار)
+    url: 'https://lcrjzbgvibracxdkepnk.supabase.co',
 
-    // مثال: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...  أو  sb_publishable_...
-    anonKey: '',
+    // publishable key: آمن للنشر بشرط تفعيل RLS (supabase/schema.sql)
+    anonKey: 'sb_publishable_WVt-Zu8J-Etr-bVbvBeF9Q_aTW_zXjy',
 
     // نطاق بريد اصطناعي يُشتق من بصمة الوثيقة (لا يُرسل إليه بريد فعلي).
     // يجب أن يطابق أي تغيير هنا إعدادات المشروع إن كنت تستخدم نطاقاً مخصصاً.

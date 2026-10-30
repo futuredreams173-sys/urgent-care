@@ -230,6 +230,7 @@
       errCloudOff: 'طبقة السحابة لم تُحمّل. أعد تحميل الصفحة أو تحقق من ملفات JavaScript.',
       errSession: 'انتهت الجلسة. سجّل الدخول مرة أخرى.',
       errEmailConfirm: 'تأكيد البريد مفعّل في Supabase. عطّل «Confirm email» لمزوّد البريد حتى يعمل تسجيل المرضى.',
+      errEmailDomain: 'رفض Supabase نطاق البريد الاصطناعي. عطّل «Confirm email» في Supabase، أو استخدم نطاقاً حقيقياً لديه سجلات MX في emailDomain.',
       errAccountExists: 'هذه الوثيقة مسجّلة مسبقاً برمز دخول مختلف. استخدم رمز الدخول الصحيح أو تواصل مع الاستقبال.',
 
       copied: 'تم النسخ',
@@ -471,6 +472,7 @@
       errCloudOff: 'The cloud layer did not load. Reload the page or check the JavaScript files.',
       errSession: 'Your session expired. Please sign in again.',
       errEmailConfirm: 'Email confirmation is enabled in Supabase. Disable “Confirm email” for the email provider so patient registration can work.',
+      errEmailDomain: 'Supabase rejected the synthetic email domain. Disable “Confirm email” in Supabase, or use a real domain with MX records for emailDomain.',
       errAccountExists: 'This document is already registered with a different access code. Use the correct code or contact reception.',
 
       copied: 'Copied',
@@ -506,6 +508,7 @@
     NOT_FOUND: 'loginNoVault',
     ACCOUNT_EXISTS: 'errAccountExists',
     EMAIL_NOT_CONFIRMED: 'errEmailConfirm',
+    EMAIL_DOMAIN_INVALID: 'errEmailDomain',
     CLOUD_NOT_CONFIGURED: 'errCloudConfig',
     CLOUD_LIB_MISSING: 'errCloudLib',
     CLOUD_DENIED: 'errCloudDenied',
