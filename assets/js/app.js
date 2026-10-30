@@ -688,7 +688,62 @@
       '<input class="input input--ltr" id="lgPin" type="password" autocomplete="current-password" maxlength="64" value="' + esc(l.pin) + '"></div>' +
       '<button class="btn btn--block btn--lg" type="button" data-act="login"' + (l.busy ? ' disabled' : '') + '>' +
       esc(l.busy ? t('loading') : t('loginBtn')) + '</button>' +
+      '<p style="margin:14px 0 0;text-align:center">' +
+      '<a href="#/forgot" data-act="go" data-screen="forgot" style="color:var(--brand);font-size:13.5px;font-weight:600;text-decoration:underline">' + esc(t('forgotLink')) + '</a>' +
+      '</p>' +
       '<p style="margin-top:16px;text-align:center;font-size:12.5px;color:var(--faint)">' + esc(t('loginHint')) + '</p>' +
+      '</div></div></div></main>' +
+      footer()
+    );
+  }
+
+  // ─── نسيت رمز الدخول ────────────────────────────────────────────────────────
+
+  function viewForgot() {
+    var bullet = function (text) {
+      return '<li style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px">' +
+        '<span style="color:var(--brand);font-weight:700;flex:none">•</span>' +
+        '<span style="font-size:14px;color:var(--ink-2)">' + esc(text) + '</span></li>';
+    };
+
+    return (
+      topbar({ hideCta: true }) +
+      '<main id="main" style="min-height:calc(100vh - var(--top-h) - 200px);display:flex;align-items:center;justify-content:center;padding:48px 0 72px">' +
+      '<div class="wrap" style="max-width:560px">' +
+      '<div class="card"><div class="card__body">' +
+      '<div style="text-align:center;margin-bottom:22px">' +
+      '<div class="success__ic" style="margin-bottom:14px">' + icon('alert', 'ic') + '</div>' +
+      '<h1 style="font-size:1.35rem;font-weight:700;color:var(--ink)">' + esc(t('forgotTitle')) + '</h1>' +
+      '<p style="margin-top:6px;color:var(--muted);font-size:14px">' + esc(t('forgotLead')) + '</p>' +
+      '</div>' +
+
+      '<div class="notice notice--warn" style="margin-bottom:20px">' + icon('info', 'ic') +
+      '<div>' + esc(t('forgotNoRecovery')) + '</div></div>' +
+
+      '<h2 style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px">' + esc(t('forgotTryTitle')) + '</h2>' +
+      '<ul style="list-style:none;padding:0;margin:0 0 22px">' +
+      bullet(t('forgotTry1')) +
+      bullet(t('forgotTry2')) +
+      bullet(t('forgotTry3')) +
+      bullet(t('forgotTry4')) +
+      '</ul>' +
+
+      '<h2 style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px">' + esc(t('forgotStepsTitle')) + '</h2>' +
+      '<ol style="padding-inline-start:20px;margin:0 0 18px;font-size:14px;color:var(--ink-2);line-height:1.9">' +
+      '<li>' + esc(t('forgotStep1')) + '</li>' +
+      '<li>' + esc(t('forgotStep2')) + '</li>' +
+      '<li>' + esc(t('forgotStep3')) + '</li>' +
+      '</ol>' +
+
+      '<div class="notice notice--danger" style="margin-bottom:22px">' + icon('lock', 'ic') +
+      '<div>' + esc(t('forgotLost')) + '</div></div>' +
+
+      '<p style="font-size:13px;color:var(--faint);margin-bottom:20px">' + esc(t('forgotTip')) + '</p>' +
+
+      '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+      '<button class="btn" type="button" style="flex:1 1 180px" data-act="go" data-screen="kiosk">' + esc(t('forgotNew')) + '</button>' +
+      '<button class="btn btn--ghost" type="button" style="flex:1 1 180px" data-act="go" data-screen="login">' + esc(t('forgotBack')) + '</button>' +
+      '</div>' +
       '</div></div></div></main>' +
       footer()
     );
@@ -887,6 +942,7 @@
     var app = $('#app');
     if (state.screen === 'kiosk') app.innerHTML = viewKiosk();
     else if (state.screen === 'login') app.innerHTML = viewLogin();
+    else if (state.screen === 'forgot') app.innerHTML = viewForgot();
     else if (state.screen === 'portal' && state.portal) app.innerHTML = viewPortal();
     else app.innerHTML = viewHome();
 
