@@ -644,6 +644,7 @@
         since: (row && row.created_at) || null,
       },
       visits: await staffVisits(),
+      patients: await staffPatients(),
     };
   }
 
@@ -696,6 +697,47 @@
             since: patient.created_at,
           }
           : null,
+      };
+    });
+  }
+
+  /**
+   * يقرأ كل المرضى المسجّلين من العرض المحدود staff_patients
+   * (بلا بصمة الوثيقة وبلا ملح التشفير) مع عدد زيارات كل واحد.
+   */
+  async function staffPatients() {
+    if (!isConfigured()) return demoStaffPatients();
+    if (!session.user) throw apiError('NOT_FOUND');
+
+    var c = getClient();
+    var results = await Promise.all([
+      c.from(TABLES.staffPatients)
+        .select('user_id,doc_type,masked_doc,phone,category,birth_date,created_at')
+        .order('created_at', { ascending: false })
+        .limit(1000),
+      c.from(TABLES.visits)
+        .select('user_id')
+        .limit(5000),
+    ]);
+
+    var patients = throwIfError(results[0]) || [];
+    var visits = throwIfError(results[1]) || [];
+
+    var counts = {};
+    visits.forEach(function (row) {
+      counts[row.user_id] = (counts[row.user_id] || 0) + 1;
+    });
+
+    return patients.map(function (row) {
+      return {
+        userId: row.user_id,
+        docType: row.doc_type,
+        masked: row.masked_doc,
+        phone: row.phone,
+        category: row.category,
+        birthDate: row.birth_date,
+        since: row.created_at,
+        visits: counts[row.user_id] || 0,
       };
     });
   }
@@ -872,6 +914,7 @@
     return {
       staff: { id: entry.account.id, name: '', role: 'staff', since: entry.account.createdAt },
       visits: demoStaffVisits(),
+      patients: demoStaffPatients(),
     };
   }
 
@@ -901,6 +944,25 @@
 
     return out.sort(function (a, b) {
       return String(b.createdAt).localeCompare(String(a.createdAt));
+    });
+  }
+
+  function demoStaffPatients() {
+    return Object.keys(demo.accounts).map(function (fingerprint) {
+      var entry = demo.accounts[fingerprint];
+      var profile = entry.data.profile || {};
+      return {
+        userId: entry.account.id,
+        docType: profile.docType || entry.account.docType,
+        masked: profile.masked || entry.account.masked,
+        phone: profile.phone || '',
+        category: profile.category || 'citizen',
+        birthDate: profile.birthDate || '',
+        since: entry.account.createdAt,
+        visits: (entry.data.visits || []).length,
+      };
+    }).sort(function (a, b) {
+      return String(b.since).localeCompare(String(a.since));
     });
   }
 
@@ -946,6 +1008,7 @@
 
     staffLogin: staffLogin,
     staffVisits: staffVisits,
+    staffPatients: staffPatients,
     staffSetVisitStatus: staffSetVisitStatus,
   };
 })(window);

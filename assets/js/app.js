@@ -851,9 +851,45 @@
     );
   }
 
+  function staffPatientCard(patient) {
+    var meta = [
+      patient.phone ? '<span dir="ltr">' + esc(formatPhone(patient.phone)) + '</span>' : '',
+      esc(categoryLabel(patient.category)),
+      esc(t('staffColJoined')) + ' ' + esc(formatDate(patient.since)),
+    ].filter(Boolean).join(' · ');
+
+    var haystack = [
+      String(patient.masked || '').replace(/•/g, ''),
+      String(patient.phone || ''),
+      String(patient.category || ''),
+      categoryLabel(patient.category),
+    ].join(' ');
+
+    return (
+      '<article class="card" data-staff-row data-haystack="' + esc(haystack) + '"><div class="card__body" style="padding:14px 18px">' +
+      '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">' +
+      '<div style="flex:1;min-width:200px">' +
+      '<b style="display:block;font-size:14.5px;color:var(--ink)">' +
+      esc(patient.masked ? docLabel(patient.docType) + ' · ' + patient.masked : t('staffUnknownPatient')) + '</b>' +
+      '<span style="display:block;margin-top:4px;font-size:12.5px;color:var(--muted)">' + meta + '</span>' +
+      '</div>' +
+      '<span class="chip">' + esc(t('staffColVisits')) + ': ' + esc(patient.visits) + '</span>' +
+      '</div></div></article>'
+    );
+  }
+
+  function staffTab(key, label, count, activeTab) {
+    var active = key === activeTab;
+    return '<button class="btn btn--sm' + (active ? '' : ' btn--soft') + '" type="button" aria-pressed="' +
+      (active ? 'true' : 'false') + '" data-act="staff-tab" data-tab="' + key + '">' +
+      esc(label) + ' <span style="opacity:.75;font-weight:600">(' + esc(count) + ')</span></button>';
+  }
+
   function viewStaffDashboard() {
     var s = state.staff;
     var visits = s.visits || [];
+    var patients = s.patients || [];
+    var tab = s.tab === 'patients' ? 'patients' : 'visits';
     var counts = { total: visits.length, waiting: 0, called: 0, done: 0 };
     visits.forEach(function (visit) {
       if (Object.prototype.hasOwnProperty.call(counts, visit.status)) counts[visit.status] += 1;
@@ -867,19 +903,35 @@
       '<div class="stat"><span class="stat__ic">' + icon('shield', 'ic') + '</span><div><b>' + counts.done + '</b><span>' + esc(t('staffStatDone')) + '</span></div></div>' +
       '</div>';
 
-    var list = visits.length
-      ? '<div class="grid" style="gap:12px">' + visits.map(staffVisitCard).join('') + '</div>'
-      : '<div class="empty"><div class="empty__ic">' + icon('calendar', 'ic') + '</div>' +
-        '<h2>' + esc(t('staffNoVisits')) + '</h2><p>' + esc(t('staffNoVisitsSub')) + '</p></div>';
+    var list = tab === 'patients'
+      ? (patients.length
+        ? '<div class="grid" style="gap:10px">' + patients.map(staffPatientCard).join('') + '</div>'
+        : '<div class="empty"><div class="empty__ic">' + icon('user', 'ic') + '</div>' +
+          '<h2>' + esc(t('staffNoPatients')) + '</h2><p>' + esc(t('staffNoPatientsSub')) + '</p></div>')
+      : (visits.length
+        ? '<div class="grid" style="gap:12px">' + visits.map(staffVisitCard).join('') + '</div>'
+        : '<div class="empty"><div class="empty__ic">' + icon('calendar', 'ic') + '</div>' +
+          '<h2>' + esc(t('staffNoVisits')) + '</h2><p>' + esc(t('staffNoVisitsSub')) + '</p></div>');
+
+    var tabs =
+      '<div class="bar" style="margin:18px 0 0;gap:8px;flex-wrap:wrap">' +
+      staffTab('visits', t('staffTabVisits'), visits.length, tab) +
+      staffTab('patients', t('staffTabPatients'), patients.length, tab) +
+      '</div>';
 
     var search =
-      '<div class="bar" style="margin:18px 0 14px;gap:10px;align-items:flex-end;flex-wrap:wrap">' +
+      '<div class="bar" style="margin:14px 0 14px;gap:10px;align-items:flex-end;flex-wrap:wrap">' +
       '<div class="field" style="flex:1 1 240px;margin:0">' +
       '<label for="stSearch">' + esc(t('staffSearch')) + '</label>' +
       '<input class="input" id="stSearch" type="search" value="' + esc(s.query || '') + '" placeholder="' + esc(t('staffSearchPh')) + '">' +
       '</div>' +
       '<button class="btn btn--outline btn--sm" type="button" data-act="staff-refresh">' + icon('refresh', 'ic') + esc(t('staffRefresh')) + '</button>' +
       '</div>';
+
+    var heading = tab === 'patients' ? t('staffPatientsList') : t('staffVisitList');
+    var tabNote = tab === 'patients'
+      ? '<p style="font-size:12.5px;color:var(--muted);margin:-4px 0 12px">' + esc(t('staffPatientsNote')) + '</p>'
+      : '';
 
     return staffShell(
       '<main id="main">' +
@@ -896,8 +948,10 @@
       (Cloud.isDemo ? '<div class="notice notice--warn" style="margin-bottom:16px">' + icon('info', 'ic') + '<div>' + esc(t('staffDemoWarning')) + '</div></div>' : '') +
       '<div class="notice notice--ok" style="margin-bottom:16px">' + icon('shield', 'ic') +
       '<div><b>' + esc(t('staffNoNotesTitle')) + '</b><br>' + esc(t('staffNoNotesBody')) + '</div></div>' +
+      tabs +
       search +
-      '<h2 style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:12px">' + esc(t('staffVisitList')) + '</h2>' +
+      '<h2 style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:12px">' + esc(heading) + '</h2>' +
+      tabNote +
       list +
       '</div>' +
       '</main>'
@@ -982,7 +1036,13 @@
       s.busy = false;
       s.pin = '';
       state.portal = null;
-      state.staff = { staff: result.staff, visits: result.visits || [], query: '' };
+      state.staff = {
+        staff: result.staff,
+        visits: result.visits || [],
+        patients: result.patients || [],
+        query: '',
+        tab: 'visits',
+      };
       state.screen = 'staff';
       render();
       window.scrollTo({ top: 0, behavior: 'auto' });
@@ -995,10 +1055,11 @@
 
   function refreshStaffVisits() {
     if (!state.staff) return;
-    Cloud.staffVisits()
-      .then(function (visits) {
+    Promise.all([Cloud.staffVisits(), Cloud.staffPatients()])
+      .then(function (results) {
         if (!state.staff) return;
-        state.staff.visits = visits || [];
+        state.staff.visits = results[0] || [];
+        state.staff.patients = results[1] || [];
         render();
         toast(t('staffRefreshed'), 'ok');
       })
@@ -1895,6 +1956,13 @@
       state.staff = null;
       state.staffLogin = { docType: 'nid', docNo: '', pin: '', error: '', busy: false };
       go('home');
+      return;
+    }
+
+    if (act === 'staff-tab') {
+      if (!state.staff) return;
+      state.staff.tab = trigger.getAttribute('data-tab') === 'patients' ? 'patients' : 'visits';
+      render();
       return;
     }
 
