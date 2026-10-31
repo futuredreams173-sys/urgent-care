@@ -66,6 +66,7 @@ $$;
 revoke all on function public.is_staff() from public;
 revoke all on function public.is_staff() from anon;
 grant execute on function public.is_staff() to authenticated;
+grant usage on schema public to authenticated;
 
 -- ============================================================================
 -- 3) عرض بيانات المراجع للموظفين
@@ -221,3 +222,8 @@ comment on function public.doc_email(text, text, text) is
 -- select p.proname, p.prosecdef
 -- from pg_proc p join pg_namespace n on n.oid = p.pronamespace
 -- where n.nspname = 'public' and p.proname in ('is_staff', 'doc_email');
+
+-- ============================================================================
+-- 10) تحديث ذاكرة PostgREST حتى ترى الواجهة الجدول والدالة والعرض فوراً
+-- ============================================================================
+notify pgrst, 'reload schema';
