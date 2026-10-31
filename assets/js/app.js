@@ -198,10 +198,8 @@
   var state = {
     screen: 'home',
     kiosk: freshKiosk(),
-    login: { docType: 'nid', docNo: '', pin: '', error: '', busy: false },
+    login: { docType: 'nid', docNo: '', phone: '', pin: '', error: '', busy: false },
     portal: null,
-    staff: null,
-    staffLogin: { docType: 'nid', docNo: '', pin: '', error: '', busy: false },
   };
 
   // ─── الأجزاء المشتركة ───────────────────────────────────────────────────────
@@ -674,7 +672,11 @@
       '<h1 style="font-size:1.4rem;font-weight:700;color:var(--ink)">' + esc(t('loginTitle')) + '</h1>' +
       '<p style="margin-top:6px;color:var(--muted);font-size:14.5px">' + esc(t('loginSub')) + '</p>' +
       '</div>' +
-      (l.error ? '<div class="notice notice--danger" style="margin-bottom:18px">' + icon('alert', 'ic') + '<div>' + esc(errText(l.error)) + '</div></div>' : '') +
+      (l.error ? '<div class="notice notice--danger" style="margin-bottom:18px">' + icon('alert', 'ic') + '<div>' + esc(errText(l.error)) +
+        (l.error === 'NOT_FOUND' || l.error === 'INVALID_PIN' || l.error === 'loginNoVault'
+          ? '<div style="margin-top:10px"><button class="btn btn--sm" type="button" data-act="start-register">' + esc(t('loginStartRegister')) + '</button></div>'
+          : '') +
+        '</div></div>' : '') +
       (Cloud.isDemo ? '<div class="notice notice--warn" style="margin-bottom:18px">' + icon('info', 'ic') + '<div>' + esc(t('cloudDemoHint')) + '</div></div>' : '') +
       '<div class="field"><label for="lgType">' + esc(t('docType')) + '</label>' +
       '<select class="select" id="lgType">' +
@@ -686,6 +688,8 @@
       '</select></div>' +
       '<div class="field"><label for="lgDoc">' + esc(t('docNo')) + '</label>' +
       '<input class="input input--ltr" id="lgDoc" autocomplete="username" value="' + esc(l.docNo) + '" placeholder="' + esc(t('docNoPh')) + '"></div>' +
+      '<div class="field"><label for="lgPhone">' + esc(t('phone')) + '</label>' +
+      '<input class="input input--ltr" id="lgPhone" type="tel" inputmode="numeric" maxlength="14" autocomplete="tel" value="' + esc(l.phone) + '" placeholder="' + esc(t('phonePh')) + '"></div>' +
       '<div class="field"><label for="lgPin">' + esc(t('pin')) + '</label>' +
       '<input class="input input--ltr" id="lgPin" type="password" autocomplete="current-password" maxlength="64" value="' + esc(l.pin) + '"></div>' +
       '<button class="btn btn--block btn--lg" type="button" data-act="login"' + (l.busy ? ' disabled' : '') + '>' +
@@ -693,10 +697,10 @@
       '<p style="margin:14px 0 0;text-align:center">' +
       '<a href="#/forgot" data-act="go" data-screen="forgot" style="color:var(--brand);font-size:13.5px;font-weight:600;text-decoration:underline">' + esc(t('forgotLink')) + '</a>' +
       '</p>' +
+      '<p style="margin:8px 0 0;text-align:center">' +
+      '<a href="#/register" data-act="start-register" style="color:var(--brand);font-size:13.5px;font-weight:600;text-decoration:underline">' + esc(t('loginNewHere')) + '</a>' +
+      '</p>' +
       '<p style="margin-top:16px;text-align:center;font-size:12.5px;color:var(--faint)">' + esc(t('loginHint')) + '</p>' +
-      '<div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line);text-align:center">' +
-      '<a href="#/staff" data-act="go" data-screen="staff" style="color:var(--ink-2);font-size:13px;font-weight:600;text-decoration:underline">' + esc(t('staffLink')) + '</a>' +
-      '</div>' +
       '</div></div></div></main>' +
       footer()
     );
@@ -752,336 +756,6 @@
       '</div></div></div></main>' +
       footer()
     );
-  }
-
-  // ─── لوحة الموظفين ──────────────────────────────────────────────────────────
-
-  function staffShell(inner) {
-    return (
-      '<div class="portal">' +
-      '<header class="top"><div class="wrap top__in">' + brandMarkup() +
-      '<div class="top__spacer"></div>' +
-      '<div class="top__actions">' + connectionChip() + langButton() +
-      '<button class="btn btn--sm btn--ghost" type="button" data-act="staff-logout">' + icon('logout', 'ic') + esc(t('logout')) + '</button>' +
-      '</div></div></header>' +
-      inner +
-      footer() +
-      '</div>'
-    );
-  }
-
-  function viewStaffLogin() {
-    var s = state.staffLogin;
-
-    return (
-      topbar({ hideCta: true }) +
-      '<main id="main" style="min-height:calc(100vh - var(--top-h) - 200px);display:flex;align-items:center;justify-content:center;padding:48px 0 72px">' +
-      '<div class="wrap" style="max-width:520px">' +
-      '<div class="card"><div class="card__body">' +
-      '<div style="text-align:center;margin-bottom:26px">' +
-      '<div class="success__ic" style="margin-bottom:14px">' + icon('hospital', 'ic') + '</div>' +
-      '<h1 style="font-size:1.4rem;font-weight:700;color:var(--ink)">' + esc(t('staffTitle')) + '</h1>' +
-      '<p style="margin-top:6px;color:var(--muted);font-size:14.5px">' + esc(t('staffSub')) + '</p>' +
-      '</div>' +
-      (s.error ? '<div class="notice notice--danger" style="margin-bottom:18px">' + icon('alert', 'ic') + '<div>' + esc(errText(s.error)) + '</div></div>' : '') +
-      (Cloud.isDemo ? '<div class="notice notice--warn" style="margin-bottom:18px">' + icon('info', 'ic') + '<div>' + esc(t('staffDemoWarning')) + '</div></div>' : '') +
-      '<div class="field"><label for="sfType">' + esc(t('docType')) + '</label>' +
-      '<select class="select" id="sfType">' +
-      ['nid', 'iqama', 'passport']
-        .map(function (type) {
-          return '<option value="' + type + '"' + (s.docType === type ? ' selected' : '') + '>' + esc(docLabel(type)) + '</option>';
-        })
-        .join('') +
-      '</select></div>' +
-      '<div class="field"><label for="sfDoc">' + esc(t('docNo')) + '</label>' +
-      '<input class="input input--ltr" id="sfDoc" autocomplete="username" value="' + esc(s.docNo) + '" placeholder="' + esc(t('docNoPh')) + '"></div>' +
-      '<div class="field"><label for="sfPin">' + esc(t('pin')) + '</label>' +
-      '<input class="input input--ltr" id="sfPin" type="password" autocomplete="current-password" maxlength="64" value="' + esc(s.pin) + '"></div>' +
-      '<button class="btn btn--block btn--lg" type="button" data-act="staff-login"' + (s.busy ? ' disabled' : '') + '>' +
-      esc(s.busy ? t('loading') : t('staffLoginBtn')) + '</button>' +
-      '<p style="margin-top:16px;text-align:center;font-size:12.5px;color:var(--faint)">' + esc(t('staffHint')) + '</p>' +
-      '<div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line);text-align:center">' +
-      '<a href="#/portal" data-act="go" data-screen="login" style="color:var(--ink-2);font-size:13px;font-weight:600;text-decoration:underline">' + esc(t('navPortal')) + '</a>' +
-      '</div>' +
-      '</div></div></div></main>' +
-      footer()
-    );
-  }
-
-  function staffVisitCard(visit) {
-    var patient = visit.patient || {};
-    var meta = [
-      patient.phone ? '<span dir="ltr">' + esc(formatPhone(patient.phone)) + '</span>' : '',
-      esc(t('visitQueue')) + ' ' + esc(visit.queueNumber),
-      esc(formatDate(visit.createdAt)) + ' · ' + esc(formatTime(visit.createdAt)),
-    ].filter(Boolean).join(' · ');
-
-    var statusText = t(VISIT_STATUS[visit.status] || 'stWaiting');
-    var actions = [
-      { key: 'called', label: 'staffSetCalled' },
-      { key: 'done', label: 'staffSetDone' },
-      { key: 'waiting', label: 'staffSetWaiting' },
-      { key: 'cancelled', label: 'staffSetCancelled' },
-    ].filter(function (item) { return item.key !== visit.status; })
-      .map(function (item) {
-        return '<button class="btn btn--soft btn--sm" type="button" data-act="staff-status" data-id="' + esc(visit.id) +
-          '" data-status="' + item.key + '">' + esc(t(item.label)) + '</button>';
-      })
-      .join('');
-
-    var haystack = [
-      String(visit.queueNumber || ''),
-      String(patient.masked || '').replace(/•/g, ''),
-      String(patient.phone || ''),
-      String(visit.status || ''),
-    ].join(' ');
-
-    return (
-      '<article class="card" data-staff-row data-haystack="' + esc(haystack) + '"><div class="card__body" style="padding:16px 18px">' +
-      '<div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">' +
-      '<div class="visit__q" aria-hidden="true">' + esc(visit.queueNumber === null || visit.queueNumber === undefined ? '—' : visit.queueNumber) + '</div>' +
-      '<div style="flex:1;min-width:180px">' +
-      '<b style="display:block;font-size:14.5px;color:var(--ink)">' + esc(patient.masked ? docLabel(patient.docType) + ' · ' + patient.masked : t('staffUnknownPatient')) + '</b>' +
-      '<span style="display:block;margin-top:4px;font-size:12.5px;color:var(--muted)">' + meta + '</span>' +
-      '</div>' +
-      '<span class="chip">' + esc(statusText) + '</span>' +
-      '</div>' +
-      '<div class="bar" style="justify-content:flex-start;gap:8px;flex-wrap:wrap;margin-top:12px">' + actions + '</div>' +
-      '</div></article>'
-    );
-  }
-
-  function staffPatientCard(patient) {
-    var meta = [
-      patient.phone ? '<span dir="ltr">' + esc(formatPhone(patient.phone)) + '</span>' : '',
-      esc(categoryLabel(patient.category)),
-      esc(t('staffColJoined')) + ' ' + esc(formatDate(patient.since)),
-    ].filter(Boolean).join(' · ');
-
-    var haystack = [
-      String(patient.masked || '').replace(/•/g, ''),
-      String(patient.phone || ''),
-      String(patient.category || ''),
-      categoryLabel(patient.category),
-    ].join(' ');
-
-    return (
-      '<article class="card" data-staff-row data-haystack="' + esc(haystack) + '"><div class="card__body" style="padding:14px 18px">' +
-      '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">' +
-      '<div style="flex:1;min-width:200px">' +
-      '<b style="display:block;font-size:14.5px;color:var(--ink)">' +
-      esc(patient.masked ? docLabel(patient.docType) + ' · ' + patient.masked : t('staffUnknownPatient')) + '</b>' +
-      '<span style="display:block;margin-top:4px;font-size:12.5px;color:var(--muted)">' + meta + '</span>' +
-      '</div>' +
-      '<span class="chip">' + esc(t('staffColVisits')) + ': ' + esc(patient.visits) + '</span>' +
-      '</div></div></article>'
-    );
-  }
-
-  function staffTab(key, label, count, activeTab) {
-    var active = key === activeTab;
-    return '<button class="btn btn--sm' + (active ? '' : ' btn--soft') + '" type="button" aria-pressed="' +
-      (active ? 'true' : 'false') + '" data-act="staff-tab" data-tab="' + key + '">' +
-      esc(label) + ' <span style="opacity:.75;font-weight:600">(' + esc(count) + ')</span></button>';
-  }
-
-  function viewStaffDashboard() {
-    var s = state.staff;
-    var visits = s.visits || [];
-    var patients = s.patients || [];
-    var tab = s.tab === 'patients' ? 'patients' : 'visits';
-    var counts = { total: visits.length, waiting: 0, called: 0, done: 0 };
-    visits.forEach(function (visit) {
-      if (Object.prototype.hasOwnProperty.call(counts, visit.status)) counts[visit.status] += 1;
-    });
-
-    var stats =
-      '<div class="portal__stats">' +
-      '<div class="stat"><span class="stat__ic">' + icon('calendar', 'ic') + '</span><div><b>' + counts.total + '</b><span>' + esc(t('staffStatTotal')) + '</span></div></div>' +
-      '<div class="stat"><span class="stat__ic">' + icon('clock', 'ic') + '</span><div><b>' + counts.waiting + '</b><span>' + esc(t('staffStatWaiting')) + '</span></div></div>' +
-      '<div class="stat"><span class="stat__ic">' + icon('user', 'ic') + '</span><div><b>' + counts.called + '</b><span>' + esc(t('staffStatCalled')) + '</span></div></div>' +
-      '<div class="stat"><span class="stat__ic">' + icon('shield', 'ic') + '</span><div><b>' + counts.done + '</b><span>' + esc(t('staffStatDone')) + '</span></div></div>' +
-      '</div>';
-
-    var list = tab === 'patients'
-      ? (patients.length
-        ? '<div class="grid" style="gap:10px">' + patients.map(staffPatientCard).join('') + '</div>'
-        : '<div class="empty"><div class="empty__ic">' + icon('user', 'ic') + '</div>' +
-          '<h2>' + esc(t('staffNoPatients')) + '</h2><p>' + esc(t('staffNoPatientsSub')) + '</p></div>')
-      : (visits.length
-        ? '<div class="grid" style="gap:12px">' + visits.map(staffVisitCard).join('') + '</div>'
-        : '<div class="empty"><div class="empty__ic">' + icon('calendar', 'ic') + '</div>' +
-          '<h2>' + esc(t('staffNoVisits')) + '</h2><p>' + esc(t('staffNoVisitsSub')) + '</p></div>');
-
-    var tabs =
-      '<div class="bar" style="margin:18px 0 0;gap:8px;flex-wrap:wrap">' +
-      staffTab('visits', t('staffTabVisits'), visits.length, tab) +
-      staffTab('patients', t('staffTabPatients'), patients.length, tab) +
-      '</div>';
-
-    var search =
-      '<div class="bar" style="margin:14px 0 14px;gap:10px;align-items:flex-end;flex-wrap:wrap">' +
-      '<div class="field" style="flex:1 1 240px;margin:0">' +
-      '<label for="stSearch">' + esc(t('staffSearch')) + '</label>' +
-      '<input class="input" id="stSearch" type="search" value="' + esc(s.query || '') + '" placeholder="' + esc(t('staffSearchPh')) + '">' +
-      '</div>' +
-      '<button class="btn btn--outline btn--sm" type="button" data-act="staff-refresh">' + icon('refresh', 'ic') + esc(t('staffRefresh')) + '</button>' +
-      '</div>';
-
-    var heading = tab === 'patients' ? t('staffPatientsList') : t('staffVisitList');
-    var tabNote = tab === 'patients'
-      ? '<p style="font-size:12.5px;color:var(--muted);margin:-4px 0 12px">' + esc(t('staffPatientsNote')) + '</p>'
-      : '';
-
-    return staffShell(
-      '<main id="main">' +
-      '<div class="portal__hero"><div class="wrap portal__hero-in">' +
-      '<span class="avatar" aria-hidden="true">' + icon('hospital', 'ic ic--lg') + '</span>' +
-      '<div><h1>' + esc(t('staffTitle')) + '</h1>' +
-      '<p>' + esc(s.staff.name || t('staffRoleStaff')) + ' · ' +
-      esc(t(s.staff.role === 'admin' ? 'staffRoleAdmin' : 'staffRoleStaff')) + '</p></div>' +
-      '<div class="top__spacer"></div>' +
-      '<span class="chip chip--ok"><i class="dot"></i>' + esc(t('staffBadge')) + '</span>' +
-      '</div></div>' +
-
-      '<div class="wrap">' + stats +
-      (Cloud.isDemo ? '<div class="notice notice--warn" style="margin-bottom:16px">' + icon('info', 'ic') + '<div>' + esc(t('staffDemoWarning')) + '</div></div>' : '') +
-      '<div class="notice notice--ok" style="margin-bottom:16px">' + icon('shield', 'ic') +
-      '<div><b>' + esc(t('staffNoNotesTitle')) + '</b><br>' + esc(t('staffNoNotesBody')) + '</div></div>' +
-      tabs +
-      search +
-      '<h2 style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:12px">' + esc(heading) + '</h2>' +
-      tabNote +
-      list +
-      '</div>' +
-      '</main>'
-    );
-  }
-
-  function viewStaff() {
-    return state.staff ? viewStaffDashboard() : viewStaffLogin();
-  }
-
-  function applyStaffFilter() {
-    var query = String((state.staff && state.staff.query) || '').trim().toLowerCase();
-    var rows = document.querySelectorAll('[data-staff-row]');
-    Array.prototype.forEach.call(rows, function (row) {
-      var haystack = String(row.getAttribute('data-haystack') || '').toLowerCase();
-      row.hidden = !!query && haystack.indexOf(query) < 0;
-    });
-  }
-
-  function bindStaff() {
-    if (state.staff) {
-      var search = $('#stSearch');
-      if (search) {
-        search.addEventListener('input', function () {
-          state.staff.query = search.value;
-          applyStaffFilter();
-        });
-        applyStaffFilter();
-      }
-      return;
-    }
-
-    var s = state.staffLogin;
-
-    var type = $('#sfType');
-    if (type) {
-      type.addEventListener('change', function () {
-        s.docType = type.value;
-        s.docNo = '';
-        $('#sfDoc').value = '';
-        s.error = '';
-      });
-    }
-
-    var doc = $('#sfDoc');
-    if (doc) {
-      doc.addEventListener('input', function () {
-        s.docNo = normalizeDoc(s.docType, doc.value);
-        doc.value = s.docNo;
-      });
-      doc.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') doStaffLogin();
-      });
-    }
-
-    var pin = $('#sfPin');
-    if (pin) {
-      pin.addEventListener('input', function () { s.pin = pin.value; });
-      pin.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') doStaffLogin();
-      });
-    }
-  }
-
-  async function doStaffLogin() {
-    var s = state.staffLogin;
-    if (s.busy) return;
-
-    s.error = '';
-
-    if (!s.docNo || !s.pin) {
-      s.error = 'errRequired';
-      render();
-      return;
-    }
-
-    s.busy = true;
-    render();
-
-    try {
-      var result = await Cloud.staffLogin(s.docType, s.docNo, s.pin);
-      s.busy = false;
-      s.pin = '';
-      state.portal = null;
-      state.staff = {
-        staff: result.staff,
-        visits: result.visits || [],
-        patients: result.patients || [],
-        query: '',
-        tab: 'visits',
-      };
-      state.screen = 'staff';
-      render();
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    } catch (error) {
-      s.busy = false;
-      s.error = error && error.code ? error.code : 'errGeneric';
-      render();
-    }
-  }
-
-  function refreshStaffVisits() {
-    if (!state.staff) return;
-    Promise.all([Cloud.staffVisits(), Cloud.staffPatients()])
-      .then(function (results) {
-        if (!state.staff) return;
-        state.staff.visits = results[0] || [];
-        state.staff.patients = results[1] || [];
-        render();
-        toast(t('staffRefreshed'), 'ok');
-      })
-      .catch(function (error) {
-        toast(errText(error && error.code ? error.code : 'errCloud'), 'err');
-      });
-  }
-
-  function updateStaffVisit(id, status) {
-    if (!state.staff) return;
-    Cloud.staffSetVisitStatus(id, status)
-      .then(function (saved) {
-        if (!state.staff) return;
-        state.staff.visits = (state.staff.visits || []).map(function (visit) {
-          return visit.id === saved.id ? Object.assign({}, visit, { status: saved.status }) : visit;
-        });
-        render();
-        toast(t('staffUpdated'), 'ok');
-      })
-      .catch(function (error) {
-        toast(errText(error && error.code ? error.code : 'errGeneric'), 'err');
-      });
   }
 
   // ─── بوابة المريض ───────────────────────────────────────────────────────────
@@ -1279,7 +953,6 @@
     if (state.screen === 'kiosk') app.innerHTML = viewKiosk();
     else if (state.screen === 'login') app.innerHTML = viewLogin();
     else if (state.screen === 'forgot') app.innerHTML = viewForgot();
-    else if (state.screen === 'staff') app.innerHTML = viewStaff();
     else if (state.screen === 'portal' && state.portal) app.innerHTML = viewPortal();
     else app.innerHTML = viewHome();
 
@@ -1289,7 +962,6 @@
   function bindScreen() {
     if (state.screen === 'kiosk') bindKiosk();
     else if (state.screen === 'login') bindLogin();
-    else if (state.screen === 'staff') bindStaff();
   }
 
   // ─── ربط أحداث الكشك ────────────────────────────────────────────────────────
@@ -1382,6 +1054,17 @@
         doc.value = l.docNo;
       });
       doc.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') doLogin();
+      });
+    }
+
+    var phone = $('#lgPhone');
+    if (phone) {
+      phone.addEventListener('input', function () {
+        l.phone = normalizePhone(phone.value);
+        phone.value = l.phone;
+      });
+      phone.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') doLogin();
       });
     }
@@ -1622,9 +1305,16 @@
     if (l.busy) return;
 
     l.error = '';
+    l.phone = normalizePhone(l.phone);
 
-    if (!l.docNo || !l.pin) {
+    if (!l.docNo || !l.phone || !l.pin) {
       l.error = 'errRequired';
+      render();
+      return;
+    }
+
+    if (!/^05\d{8}$/.test(l.phone)) {
+      l.error = 'errPhone';
       render();
       return;
     }
@@ -1633,11 +1323,10 @@
     render();
 
     try {
-      var session = await Cloud.login(l.docType, l.docNo, l.pin);
+      var session = await Cloud.login(l.docType, l.docNo, l.pin, l.phone);
 
       l.busy = false;
       l.pin = '';
-      state.staff = null;
       openPortal(session.account, session.data);
     } catch (error) {
       l.busy = false;
@@ -1866,9 +1555,11 @@
 
     if (act === 'pick-category') {
       var cat = trigger.getAttribute('data-cat');
+      var nextType = cat === 'domestic' ? 'iqama' : 'nid';
+      var keepDoc = state.kiosk.docType === nextType ? state.kiosk.docNo : '';
       state.kiosk.category = cat;
-      state.kiosk.docType = cat === 'domestic' ? 'iqama' : 'nid';
-      state.kiosk.docNo = '';
+      state.kiosk.docType = nextType;
+      state.kiosk.docNo = keepDoc;
       state.kiosk.cal = 'greg';
       state.kiosk.errors = {};
       state.kiosk.step = 2;
@@ -1933,6 +1624,17 @@
       return;
     }
 
+    if (act === 'start-register') {
+      var l = state.login;
+      var kiosk = freshKiosk();
+      kiosk.docType = l.docType;
+      kiosk.docNo = l.docNo;
+      kiosk.phone = normalizePhone(l.phone);
+      state.kiosk = kiosk;
+      go('kiosk');
+      return;
+    }
+
     if (act === 'login') {
       doLogin();
       return;
@@ -1941,38 +1643,8 @@
     if (act === 'logout') {
       Cloud.logout();
       state.portal = null;
-      state.login = { docType: 'nid', docNo: '', pin: '', error: '', busy: false };
+      state.login = { docType: 'nid', docNo: '', phone: '', pin: '', error: '', busy: false };
       go('home');
-      return;
-    }
-
-    if (act === 'staff-login') {
-      doStaffLogin();
-      return;
-    }
-
-    if (act === 'staff-logout') {
-      Cloud.logout();
-      state.staff = null;
-      state.staffLogin = { docType: 'nid', docNo: '', pin: '', error: '', busy: false };
-      go('home');
-      return;
-    }
-
-    if (act === 'staff-tab') {
-      if (!state.staff) return;
-      state.staff.tab = trigger.getAttribute('data-tab') === 'patients' ? 'patients' : 'visits';
-      render();
-      return;
-    }
-
-    if (act === 'staff-refresh') {
-      refreshStaffVisits();
-      return;
-    }
-
-    if (act === 'staff-status') {
-      updateStaffVisit(trigger.getAttribute('data-id'), trigger.getAttribute('data-status'));
       return;
     }
 

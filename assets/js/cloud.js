@@ -106,6 +106,18 @@
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
   }
 
+  /** يوحّد رقم الجوال: أرقام عربية/فارسية، 00966، +966، أو 5xxxxxxxx. */
+  function normalizePhone(value) {
+    var v = String(value || '')
+      .replace(/[٠-٩]/g, function (d) { return String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)); })
+      .replace(/[۰-۹]/g, function (d) { return String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)); })
+      .replace(/\D/g, '');
+    if (v.indexOf('00966') === 0) v = v.slice(5);
+    else if (v.indexOf('966') === 0) v = v.slice(3);
+    if (v.length === 9 && v.charAt(0) === '5') v = '0' + v;
+    return v;
+  }
+
   function mapAuthError(error) {
     var message = String((error && error.message) || '').toLowerCase();
 
@@ -381,8 +393,8 @@
 
   // ─── الدخول ─────────────────────────────────────────────────────────────────
 
-  async function login(docType, docNumber, pin) {
-    if (!isConfigured()) return demoLogin(docType, docNumber, pin);
+  async function login(docType, docNumber, pin, phone) {
+    if (!isConfigured()) return demoLogin(docType, docNumber, pin, phone);
 
     var c = getClient();
     var identity = await emailFor(docType, docNumber);
@@ -399,6 +411,13 @@
       try { await c.auth.signOut(); } catch (error) { /* تجاهل */ }
       resetSession();
       throw apiError('NOT_FOUND');
+    }
+
+    var registeredPhone = normalizePhone(patient.phone);
+    if (registeredPhone && normalizePhone(phone) !== registeredPhone) {
+      try { await c.auth.signOut(); } catch (error) { /* تجاهل */ }
+      resetSession();
+      throw apiError('PHONE_MISMATCH');
     }
 
     var key = await C.deriveKey(pin, patient.salt);
@@ -836,11 +855,14 @@
     };
   }
 
-  async function demoLogin(docType, docNumber, pin) {
+  async function demoLogin(docType, docNumber, pin, phone) {
     var identity = await emailFor(docType, docNumber);
     var entry = demo.accounts[identity.fingerprint];
     if (!entry) throw apiError('NOT_FOUND');
     if (entry.pin !== pin) throw apiError('INVALID_PIN');
+
+    var registeredPhone = normalizePhone((entry.data.profile || {}).phone);
+    if (registeredPhone && normalizePhone(phone) !== registeredPhone) throw apiError('PHONE_MISMATCH');
 
     session = {
       user: { id: entry.account.id },
