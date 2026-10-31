@@ -133,6 +133,16 @@
       loginNoVault: 'لا يوجد ملف سحابي لهذه الوثيقة. سجّل زيارتك أولاً ثم حاول مرة أخرى.',
       loginHint: 'ملفك محفوظ في حسابك السحابي، ولا يُفتح إلا برمز الدخول الخاص بك.',
 
+      homeLoginTitle: 'دخول مباشر للمراجعين',
+      homeLoginSub: 'للمسجّلين سابقاً — هوية وطنية، إقامة عمالة منزلية، أو تأمين. أدخل بياناتك للوصول إلى ملفك.',
+      homeLoginBtn: 'دخول',
+      homeRemember: 'نحفظ آخر رقم وثيقة وجوال على هذا الجهاز لتسهيل الدخول، ولا نحفظ رمز الدخول أبداً.',
+      regAutoHint: 'إن لم تكن مسجّلاً فسيتم تحويلك إلى التسجيل تلقائياً.',
+      regNoticeFallback: 'تعذّر الدخول بهذه البيانات. أكمل التسجيل إن لم تكن مسجّلاً، أو ارجع للدخول وتأكد من رمزك.',
+      regNoticeBack: 'رجوع للدخول',
+      regCountLabel: 'مسجّل',
+      regCountTitle: 'عدد المراجعين المسجّلين',
+
       forgotLink: 'نسيت رمز الدخول؟',
       forgotTitle: 'نسيت رمز الدخول؟',
       forgotLead: 'رمز الدخول ليس كلمة مرور عادية — إنه المفتاح الذي يُشفَّر به ملفك، ولا يمكن استعادته.',
@@ -451,6 +461,16 @@
       loginBtn: 'Sign in',
       loginNoVault: 'No cloud record exists for this document. Register your visit first, then try again.',
       loginHint: 'Your record lives in your cloud account and opens only with your access code.',
+
+      homeLoginTitle: 'Direct visitor sign-in',
+      homeLoginSub: 'For returning visitors — national ID, domestic-worker iqama, or insurance. Enter your details to open your record.',
+      homeLoginBtn: 'Sign in',
+      homeRemember: 'We remember your last document number and mobile on this device. Your access code is never saved.',
+      regAutoHint: 'If you are not registered yet, you will be taken to registration automatically.',
+      regNoticeFallback: 'We could not sign you in with these details. Complete registration if you are new, or go back and check your access code.',
+      regNoticeBack: 'Back to sign-in',
+      regCountLabel: 'registered',
+      regCountTitle: 'Number of registered visitors',
 
       forgotLink: 'Forgot your access code?',
       forgotTitle: 'Forgot your access code?',

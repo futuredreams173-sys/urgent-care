@@ -48,6 +48,48 @@
     return value;
   }
 
+  // ─── تذكّر آخر دخول (بدون رمز الدخول أبداً) ────────────────────────────────
+
+  var LAST_LOGIN_KEY = 'enaya.lastLogin';
+
+  function rememberLogin(login) {
+    try {
+      localStorage.setItem(
+        LAST_LOGIN_KEY,
+        JSON.stringify({
+          docType: login.docType,
+          docNo: login.docNo,
+          phone: login.phone,
+        })
+      );
+    } catch (error) {
+      /* التخزين المحلي قد يكون معطّلاً — لا نُفشل الدخول بسببه */
+    }
+  }
+
+  function restoreLogin() {
+    try {
+      var raw = localStorage.getItem(LAST_LOGIN_KEY);
+      if (!raw) return null;
+      var saved = JSON.parse(raw);
+      if (!saved || typeof saved !== 'object') return null;
+      return {
+        docType: ['nid', 'iqama', 'passport'].indexOf(saved.docType) >= 0 ? saved.docType : 'nid',
+        docNo: normalizeDoc(saved.docType, saved.docNo || ''),
+        phone: normalizePhone(saved.phone || ''),
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function freshLogin() {
+    return Object.assign(
+      { docType: 'nid', docNo: '', phone: '', pin: '', error: '', busy: false },
+      restoreLogin() || {}
+    );
+  }
+
   function toast(message, kind) {
     var el = $('#toast');
     if (!el) return;
@@ -191,6 +233,7 @@
       errors: {},
       result: null,
       session: null,
+      notice: '',
       busy: false,
     };
   }
@@ -198,7 +241,9 @@
   var state = {
     screen: 'home',
     kiosk: freshKiosk(),
-    login: { docType: 'nid', docNo: '', phone: '', pin: '', error: '', busy: false },
+    login: freshLogin(),
+    regCount: null,
+    regCountFailed: false,
     portal: null,
   };
 
@@ -305,6 +350,8 @@
   // ─── الصفحة الرئيسية ────────────────────────────────────────────────────────
 
   function viewHome() {
+    var hl = state.login;
+
     var features = [
       { ic: 'clock', t: 'feat1t', d: 'feat1d' },
       { ic: 'shield', t: 'feat2t', d: 'feat2d' },
@@ -339,14 +386,40 @@
       '</div>' +
       '<div class="showcase reveal">' +
       '<div class="showcase__glow"></div>' +
+      '<div class="reg-badge" id="regCount" hidden title="' + esc(t('regCountTitle')) + '">' +
+      icon('user', 'ic ic--sm') + '<b>0</b><span>' + esc(t('regCountLabel')) + '</span></div>' +
       '<div class="kiosk-card">' +
-      '<div class="kiosk-card__bar"><b>' + esc(t('brand')) + '</b><div class="dots"><i></i><i></i><i></i></div></div>' +
+      '<div class="kiosk-card__bar"><b>' + esc(t('homeLoginTitle')) + '</b><div class="dots"><i></i><i></i><i></i></div></div>' +
       '<div class="kiosk-card__body">' +
-      '<div class="queue"><div class="queue__label">' + esc(t('showLabel')) + '</div><div class="queue__num">104</div></div>' +
-      '<div class="sync-list">' +
-      '<div class="sync-row"><span class="sync-row__name">' + icon('hospital', 'ic ic--sm') + esc(t('raqeem')) + '</span>' + statusChip('ok') + '</div>' +
-      '<div class="sync-row"><span class="sync-row__name">' + icon('steth', 'ic ic--sm') + esc(t('sehhaty')) + '</span>' + statusChip('ok') + '</div>' +
+      '<p class="entry-sub">' + esc(t('homeLoginSub')) + '</p>' +
+      (hl.error
+        ? '<div class="notice notice--danger" style="margin-bottom:16px">' + icon('alert', 'ic') +
+          '<div>' + esc(errText(hl.error)) +
+          '<div style="margin-top:10px"><button class="btn btn--sm" type="button" data-act="start-register">' +
+          esc(t('loginStartRegister')) + '</button></div>' +
+          '<div style="margin-top:8px;font-size:12px">' + esc(t('regAutoHint')) + '</div></div></div>'
+        : '') +
+      '<div class="field"><label for="lgType">' + esc(t('docType')) + '</label>' +
+      '<select class="select" id="lgType">' +
+      ['nid', 'iqama', 'passport']
+        .map(function (type) {
+          return '<option value="' + type + '"' + (hl.docType === type ? ' selected' : '') + '>' + esc(docLabel(type)) + '</option>';
+        })
+        .join('') +
+      '</select></div>' +
+      '<div class="field"><label for="lgDoc">' + esc(t('docNo')) + '</label>' +
+      '<input class="input input--ltr" id="lgDoc" autocomplete="username" value="' + esc(hl.docNo) + '" placeholder="' + esc(t('docNoPh')) + '"></div>' +
+      '<div class="field"><label for="lgPhone">' + esc(t('phone')) + '</label>' +
+      '<input class="input input--ltr" id="lgPhone" type="tel" inputmode="numeric" maxlength="14" autocomplete="tel" value="' + esc(hl.phone) + '" placeholder="' + esc(t('phonePh')) + '"></div>' +
+      '<div class="field"><label for="lgPin">' + esc(t('pin')) + '</label>' +
+      '<input class="input input--ltr" id="lgPin" type="password" autocomplete="current-password" maxlength="64" value="' + esc(hl.pin) + '"></div>' +
+      '<button class="btn btn--block btn--lg" type="button" data-act="login"' + (hl.busy ? ' disabled' : '') + '>' +
+      icon('lock', 'ic') + esc(hl.busy ? t('loading') : t('homeLoginBtn')) + '</button>' +
+      '<div class="entry-links">' +
+      '<a href="#/register" data-act="start-register">' + esc(t('loginNewHere')) + '</a>' +
+      '<a href="#/forgot" data-act="go" data-screen="forgot">' + esc(t('forgotLink')) + '</a>' +
       '</div>' +
+      '<p class="entry-note">' + icon('shield', 'ic ic--sm') + esc(t('homeRemember')) + '</p>' +
       '</div>' +
       '</div>' +
       '<div class="float-card">' +
@@ -652,7 +725,13 @@
       inner = kioskStep4();
     } else {
       var body = k.step === 1 ? kioskStep1() : k.step === 2 ? kioskStep2() : kioskStep3();
-      inner = progressBar(k.step) + body;
+      var notice = k.notice
+        ? '<div class="notice notice--warn" style="margin-bottom:16px">' + icon('info', 'ic') +
+          '<div>' + esc(t(k.notice)) +
+          ' <a href="#/portal" data-act="go" data-screen="login" style="color:var(--brand-700);font-weight:700;text-decoration:underline">' +
+          esc(t('regNoticeBack')) + '</a></div></div>'
+        : '';
+      inner = progressBar(k.step) + notice + body;
     }
 
     return kioskShell(inner);
@@ -958,11 +1037,40 @@
     else app.innerHTML = viewHome();
 
     bindScreen();
+
+    if (state.screen === 'home') loadRegCount();
+  }
+
+  // ─── عدد المراجعين المسجّلين على الصفحة الرئيسية ────────────────────────────
+
+  function loadRegCount() {
+    if (typeof state.regCount === 'number') {
+      paintRegCount();
+      return;
+    }
+    if (state.regCountFailed) return;
+
+    Cloud.registeredCount().then(function (value) {
+      if (typeof value !== 'number') {
+        state.regCountFailed = true; // الدالة غير منشورة بعد → تُخفى الأيقونة بلا تكرار
+        return;
+      }
+      state.regCount = value;
+      paintRegCount();
+    });
+  }
+
+  function paintRegCount() {
+    var badge = $('#regCount');
+    if (!badge || typeof state.regCount !== 'number') return;
+    var num = badge.querySelector('b');
+    if (num) num.textContent = String(state.regCount);
+    badge.hidden = false;
   }
 
   function bindScreen() {
     if (state.screen === 'kiosk') bindKiosk();
-    else if (state.screen === 'login') bindLogin();
+    else if (state.screen === 'login' || state.screen === 'home') bindLogin();
   }
 
   // ─── ربط أحداث الكشك ────────────────────────────────────────────────────────
@@ -1082,6 +1190,7 @@
   // ─── التنقل ─────────────────────────────────────────────────────────────────
 
   function go(screen) {
+    clearTimeout(autoRegisterTimer);
     if (screen === 'portal' && !state.portal) screen = 'login';
     state.screen = screen;
     if (screen === 'kiosk' && state.kiosk.step === 4 && !state.kiosk.result) {
@@ -1255,6 +1364,7 @@
         k.session = session;
         k.busy = false;
         k.step = 4;
+        state.regCount = null;
         render();
         toast(t('registered'), 'ok');
         return;
@@ -1290,6 +1400,7 @@
       k.session = localSession;
       k.busy = false;
       k.step = 4;
+      state.regCount = null;
       render();
     } catch (error) {
       k.busy = false;
@@ -1326,14 +1437,47 @@
     try {
       var session = await Cloud.login(l.docType, l.docNo, l.pin, l.phone);
 
+      rememberLogin(l);
       l.busy = false;
       l.pin = '';
       openPortal(session.account, session.data);
     } catch (error) {
       l.busy = false;
       l.error = error && error.code ? error.code : 'errGeneric';
+
+      var unknown = l.error === 'NOT_FOUND' || l.error === 'INVALID_PIN';
       render();
+
+      // على الصفحة الرئيسية: من فشل دخوله (غير مسجّل غالباً) يُنقل تلقائياً
+      // إلى التسجيل مع بياناته، مع إبقاء رسالة واضحة وزر رجوع للدخول.
+      if (unknown && state.screen === 'home') {
+        clearTimeout(autoRegisterTimer);
+        autoRegisterTimer = setTimeout(function () {
+          if (state.screen === 'home') startRegisterFlow();
+        }, 2200);
+      }
     }
+  }
+
+  var autoRegisterTimer = null;
+
+  function startRegisterFlow() {
+    clearTimeout(autoRegisterTimer);
+
+    var l = state.login;
+    var fallback = l.error === 'NOT_FOUND' || l.error === 'INVALID_PIN';
+    var kiosk = freshKiosk();
+
+    kiosk.docType = l.docType || 'nid';
+    kiosk.docNo = normalizeDoc(kiosk.docType, l.docNo || '');
+    kiosk.phone = normalizePhone(l.phone || '');
+    kiosk.category = kiosk.docType === 'iqama' ? 'domestic' : kiosk.docType === 'nid' ? 'citizen' : null;
+    kiosk.step = kiosk.category ? 2 : 1;
+    kiosk.notice = fallback ? 'regNoticeFallback' : '';
+
+    state.kiosk = kiosk;
+    l.error = '';
+    go('kiosk');
   }
 
   function openPortal(account, data) {
@@ -1556,13 +1700,18 @@
 
     if (act === 'pick-category') {
       var cat = trigger.getAttribute('data-cat');
-      var nextType = cat === 'domestic' ? 'iqama' : 'nid';
+      var nextType = cat === 'domestic'
+        ? 'iqama'
+        : cat === 'citizen'
+          ? 'nid'
+          : state.kiosk.docType === 'iqama' ? 'iqama' : 'nid';
       var keepDoc = state.kiosk.docType === nextType ? state.kiosk.docNo : '';
       state.kiosk.category = cat;
       state.kiosk.docType = nextType;
       state.kiosk.docNo = keepDoc;
       state.kiosk.cal = 'greg';
       state.kiosk.errors = {};
+      state.kiosk.notice = '';
       state.kiosk.step = 2;
       render();
       return;
@@ -1626,13 +1775,7 @@
     }
 
     if (act === 'start-register') {
-      var l = state.login;
-      var kiosk = freshKiosk();
-      kiosk.docType = l.docType;
-      kiosk.docNo = l.docNo;
-      kiosk.phone = normalizePhone(l.phone);
-      state.kiosk = kiosk;
-      go('kiosk');
+      startRegisterFlow();
       return;
     }
 
@@ -1644,7 +1787,7 @@
     if (act === 'logout') {
       Cloud.logout();
       state.portal = null;
-      state.login = { docType: 'nid', docNo: '', phone: '', pin: '', error: '', busy: false };
+      state.login = freshLogin();
       go('home');
       return;
     }

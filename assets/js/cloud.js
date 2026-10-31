@@ -1001,6 +1001,21 @@
     return found;
   }
 
+  // ─── عدد المراجعين المسجّلين (رقم فقط، بلا أي بيانات شخصية) ────────────────
+
+  async function registeredCount() {
+    if (!isConfigured()) return null;
+    try {
+      var result = await getClient().rpc('registered_count');
+      if (!result || result.error) return null;
+      var value = result.data;
+      if (typeof value === 'string') value = parseInt(value, 10);
+      return typeof value === 'number' && isFinite(value) ? value : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
   // ─── الواجهة العامة ─────────────────────────────────────────────────────────
 
   global.UrgentCloud = {
@@ -1019,6 +1034,8 @@
     register: register,
     login: login,
     logout: logout,
+
+    registeredCount: registeredCount,
     refresh: refresh,
     fetchRecord: refresh,
 
