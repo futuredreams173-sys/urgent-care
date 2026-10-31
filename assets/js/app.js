@@ -324,7 +324,8 @@
       '<section class="hero"><div class="wrap hero__in">' +
       '<div class="reveal">' +
       '<span class="eyebrow"><i class="dot"></i>' + esc(t('heroBadge')) + '</span>' +
-      '<h1>' + esc(t('heroTitleA')) + ' <em>' + esc(t('heroTitleEm')) + '</em></h1>' +
+      '<h1>' + esc(t('heroTitleA')) +
+      (t('heroTitleEm') ? ' <em>' + esc(t('heroTitleEm')) + '</em>' : '') + '</h1>' +
       '<p class="hero__lead">' + esc(t('heroLead')) + '</p>' +
       '<div class="hero__cta">' +
       '<a class="btn btn--lg" href="#/register" data-act="go" data-screen="kiosk">' + icon('plus', 'ic') + esc(t('heroCta1')) + '</a>' +

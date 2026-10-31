@@ -17,7 +17,7 @@
 
       heroBadge: 'التسجيل الذاتي متاح الآن',
       heroTitleA: 'رعاية عاجلة',
-      heroTitleEm: 'عندما تحتاجها',
+      heroTitleEm: '',
       heroLead: 'منصة «الرعاية العاجلة» تتيح لك تسجيل بياناتك بنفسك، واستلام رقم الانتظار فوراً، ومتابعة ملفك الطبي في مكان واحد — بخصوصية تامة ودون انتظار في الاستقبال.',
       heroCta1: 'ابدأ التسجيل',
       heroCta2: 'دخول المراجعين',
@@ -336,7 +336,7 @@
 
       heroBadge: 'Self-registration is open',
       heroTitleA: 'Urgent care',
-      heroTitleEm: 'when you need it',
+      heroTitleEm: '',
       heroLead: 'Urgent Care lets you check in yourself, receive your queue number instantly, and follow your medical record in one place — privately, with no reception queue.',
       heroCta1: 'Start registration',
       heroCta2: 'Visitor sign-in',
