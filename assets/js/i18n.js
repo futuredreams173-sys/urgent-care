@@ -13,14 +13,14 @@
 
       navHome: 'الرئيسية',
       navRegister: 'التسجيل الذاتي',
-      navPortal: 'بوابة المريض',
+      navPortal: 'بوابة المراجع',
 
       heroBadge: 'التسجيل الذاتي متاح الآن',
       heroTitleA: 'رعاية عاجلة',
       heroTitleEm: 'عندما تحتاجها',
       heroLead: 'منصة «الرعاية العاجلة» تتيح لك تسجيل بياناتك بنفسك، واستلام رقم الانتظار فوراً، ومتابعة ملفك الطبي في مكان واحد — بخصوصية تامة ودون انتظار في الاستقبال.',
       heroCta1: 'ابدأ التسجيل',
-      heroCta2: 'دخول المرضى',
+      heroCta2: 'دخول المراجعين',
       trust1t: 'رقم انتظار فوري',
       trust1s: 'دون طوابير الاستقبال',
       trust2t: 'مزامنة رقيم وصحتي',
@@ -124,7 +124,7 @@
       syncWait: 'قيد الانتظار',
       syncOffline: 'غير متاح',
 
-      loginTitle: 'بوابة المريض',
+      loginTitle: 'بوابة المراجع',
       loginSub: 'ادخل برقم وثيقتك وجوالك ورمز الدخول لعرض ملفك الصحي',
       loginNewHere: 'ليس لديك حساب؟ سجّل الآن',
       loginStartRegister: 'تسجيل حساب جديد بهذه البيانات',
@@ -306,7 +306,7 @@
       errPinWeak: 'الرمز الجديد ضعيف أو ظهر في قوائم كلمات المرور المسرّبة. اختر رمزاً أقوى.',
       errNotesLocked: 'تعذّر فك تشفير إحدى الملاحظات، لذلك أُوقف التغيير ولم يُحفظ أي تعديل.',
       errPinRollback: 'فشل التغيير وتعذّر التراجع الكامل. سجّل الدخول وتحقّق من ملاحظاتك، وتواصل مع الاستقبال إن لزم.',
-      errNotStaff: 'هذا الحساب ليس حساب موظف. استخدم بوابة المريض للدخول.',
+      errNotStaff: 'هذا الحساب ليس حساب موظف. استخدم بوابة المراجع للدخول.',
       errStaffSetup: 'لوحة الموظفين غير مُفعّلة في قاعدة البيانات بعد. نفّذ ملف supabase/staff.sql في Supabase SQL Editor.',
       errStaffDenied: 'لا تملك صلاحية الموظف لهذا الإجراء.',
 
@@ -332,14 +332,14 @@
 
       navHome: 'Home',
       navRegister: 'Self registration',
-      navPortal: 'Patient portal',
+      navPortal: 'Visitor portal',
 
       heroBadge: 'Self-registration is open',
       heroTitleA: 'Urgent care',
       heroTitleEm: 'when you need it',
       heroLead: 'Urgent Care lets you check in yourself, receive your queue number instantly, and follow your medical record in one place — privately, with no reception queue.',
       heroCta1: 'Start registration',
-      heroCta2: 'Patient sign-in',
+      heroCta2: 'Visitor sign-in',
       trust1t: 'Instant queue number',
       trust1s: 'No reception lines',
       trust2t: 'Raqeem & Sehhaty sync',
@@ -443,7 +443,7 @@
       syncWait: 'Pending',
       syncOffline: 'Unavailable',
 
-      loginTitle: 'Patient portal',
+      loginTitle: 'Visitor portal',
       loginSub: 'Sign in with your document number, mobile and access code',
       loginNewHere: 'No account yet? Register now',
       loginStartRegister: 'Create a new account with these details',
