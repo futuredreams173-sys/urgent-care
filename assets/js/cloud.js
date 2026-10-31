@@ -25,9 +25,18 @@
   var SUPABASE_KEY = String(CONFIG.anonKey || CONFIG.publishableKey || '').trim();
   var EMAIL_DOMAIN = String(CONFIG.emailDomain || 'patients.urgentcare.app').trim().replace(/^@/, '');
 
-  var TABLES = { patients: 'patients', visits: 'visits', notes: 'notes' };
+  var TABLES = {
+    patients: 'patients',
+    visits: 'visits',
+    notes: 'notes',
+    staff: 'staff',
+    staffPatients: 'staff_patients',
+  };
   var TITLE_MAX = 80;
   var BODY_MAX = 2000;
+  var PIN_MIN = 6;
+  var PIN_MAX = 72;
+  var VISIT_STATUSES = { waiting: 1, called: 1, done: 1, cancelled: 1 };
 
   var client = null;
   var session = { user: null, patient: null, key: null, email: null, demoKey: null };
@@ -116,6 +125,25 @@
     return apiError('errCloud', { detail: (error && error.message) || 'AUTH_ERROR' });
   }
 
+  function mapPinError(error) {
+    var message = String((error && error.message) || '').toLowerCase();
+
+    if (message.indexOf('different from the old') >= 0 || message.indexOf('same password') >= 0) {
+      return apiError('PIN_SAME');
+    }
+    if (message.indexOf('weak') >= 0 || message.indexOf('pwned') >= 0 || message.indexOf('leaked') >= 0) {
+      return apiError('PIN_WEAK');
+    }
+    if (message.indexOf('at least') >= 0 || message.indexOf('too short') >= 0) return apiError('errPinShort');
+    if (message.indexOf('too long') >= 0 || message.indexOf('at most') >= 0) return apiError('errPinLong');
+    if (message.indexOf('rate limit') >= 0 || message.indexOf('for security purposes') >= 0) {
+      return apiError('CLOUD_RATE_LIMIT');
+    }
+    if (message.indexOf('failed to fetch') >= 0 || message.indexOf('network') >= 0) return apiError('errCloud');
+
+    return apiError('errCloud', { detail: (error && error.message) || 'PIN_ERROR' });
+  }
+
   function mapDbError(error) {
     var code = error && error.code;
     var message = String((error && error.message) || '').toLowerCase();
@@ -188,6 +216,13 @@
     var cleanBody = String(body || '').trim().slice(0, BODY_MAX);
     if (!cleanTitle && !cleanBody) throw apiError('errRequired');
     return { title: cleanTitle, body: cleanBody };
+  }
+
+  function cleanPin(pin) {
+    var value = String(pin === null || pin === undefined ? '' : pin);
+    if (value.length < PIN_MIN) throw apiError('errPinShort');
+    if (value.length > PIN_MAX) throw apiError('errPinLong');
+    return value;
   }
 
   function demoId(prefix) {
@@ -451,6 +486,240 @@
     return { id: id };
   }
 
+  // ─── تغيير رمز الدخول (إعادة تشفير الملاحظات) ───────────────────────────────
+
+  /**
+   * يغيّر رمز الدخول مع الحفاظ على الملاحظات:
+   *   1. يتحقق من الرمز الحالي عبر خادم Supabase (إعادة تسجيل دخول).
+   *   2. يفك تشفير كل الملاحظات بالمفتاح القديم.
+   *   3. يشفّرها مسبقاً بالمفتاح الجديد (قبل أي كتابة).
+   *   4. يحدّث كلمة مرور الحساب.
+   *   5. يكتب الحمولات الجديدة، ويرجع كل شيء للحالة الأصلية عند أي فشل.
+   */
+  async function changePin(currentPin, newPin) {
+    var current = String(currentPin === null || currentPin === undefined ? '' : currentPin);
+    var next = cleanPin(newPin);
+
+    if (!current) throw apiError('errRequired');
+    if (current === next) throw apiError('PIN_SAME');
+
+    if (!isConfigured()) return demoChangePin(current, next);
+
+    if (!session.user || !session.patient || !session.key) throw apiError('NOT_FOUND');
+
+    var c = getClient();
+    var userId = session.user.id;
+    var email = session.email;
+    var salt = session.patient.salt;
+
+    // 1) تحقق الخادم من الرمز الحالي
+    var reauth = await c.auth.signInWithPassword({ email: email, password: current });
+    if (reauth.error || !reauth.data || !reauth.data.user || reauth.data.user.id !== userId) {
+      throw apiError('WRONG_PIN');
+    }
+
+    // 2) فك تشفير كل الملاحظات قبل أي تعديل
+    var rows = throwIfError(
+      await c.from(TABLES.notes)
+        .select('id,payload,updated_at')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: true })
+    ) || [];
+
+    var oldKey = await C.deriveKey(current, salt);
+    var plains = [];
+    for (var i = 0; i < rows.length; i += 1) {
+      try {
+        plains.push({
+          id: rows[i].id,
+          plain: await C.decryptString(rows[i].payload, oldKey),
+          payload: rows[i].payload,
+          updatedAt: rows[i].updated_at,
+        });
+      } catch (error) {
+        // ملاحظة لا تُفك بالرمز الحالي: نوقف العملية بدل إتلافها.
+        throw apiError('NOTES_LOCKED');
+      }
+    }
+
+    // 3) تشفير مسبق بالمفتاح الجديد — لا نكتب شيئاً قبل نجاح هذه الخطوة كاملة
+    var newKey = await C.deriveKey(next, salt);
+    var sealed = [];
+    for (var j = 0; j < plains.length; j += 1) {
+      sealed.push({
+        id: plains[j].id,
+        payload: await C.encryptString(plains[j].plain, newKey),
+        updatedAt: plains[j].updatedAt,
+      });
+    }
+
+    // 4) تحديث كلمة مرور الحساب في Supabase Auth
+    var updated = await c.auth.updateUser({ password: next });
+    if (updated.error) throw mapPinError(updated.error);
+
+    // 5) كتابة الملاحظات، مع تراجع كامل عند أي فشل
+    try {
+      for (var k = 0; k < sealed.length; k += 1) {
+        var res = await c.from(TABLES.notes)
+          .update({ payload: sealed[k].payload, updated_at: sealed[k].updatedAt })
+          .eq('id', sealed[k].id)
+          .eq('user_id', userId)
+          .select('id')
+          .maybeSingle();
+        if (res.error) throw mapDbError(res.error);
+        if (!res.data) throw apiError('CLOUD_DENIED');
+      }
+    } catch (error) {
+      var rollbackFailed = false;
+
+      for (var m = 0; m < plains.length; m += 1) {
+        var back = await c.from(TABLES.notes)
+          .update({ payload: plains[m].payload, updated_at: plains[m].updatedAt })
+          .eq('id', plains[m].id)
+          .eq('user_id', userId);
+        if (back.error) rollbackFailed = true;
+      }
+
+      var restored = await c.auth.updateUser({ password: current });
+      if (restored.error) rollbackFailed = true;
+
+      if (rollbackFailed) throw apiError('PIN_ROLLBACK');
+      throw error;
+    }
+
+    session.key = newKey;
+    return { changed: true, notes: sealed.length };
+  }
+
+  // ─── الموظفون ───────────────────────────────────────────────────────────────
+
+  /**
+   * دخول فريق المركز: نفس رقم الوثيقة ورمز الدخول، ثم التحقق من عضوية
+   * جدول staff على الخادم. أي حساب غير موظف يُفصل فوراً.
+   */
+  async function staffLogin(docType, docNumber, pin) {
+    if (!isConfigured()) return demoStaffLogin(docType, docNumber, pin);
+
+    var c = getClient();
+    var identity = await emailFor(docType, docNumber);
+
+    var signedIn = await c.auth.signInWithPassword({ email: identity.email, password: pin });
+    if (signedIn.error) throw mapAuthError(signedIn.error);
+    if (!signedIn.data || !signedIn.data.user) throw apiError('INVALID_PIN');
+
+    var userId = signedIn.data.user.id;
+
+    var check = await c.rpc('is_staff');
+    if (check.error) {
+      await signOutQuietly(c);
+      if (isMissingFunction(check.error)) throw apiError('STAFF_SETUP_REQUIRED');
+      throw mapDbError(check.error);
+    }
+
+    if (check.data !== true) {
+      await signOutQuietly(c);
+      throw apiError('NOT_STAFF');
+    }
+
+    var row = null;
+    var profile = await c.from(TABLES.staff)
+      .select('full_name,role,created_at')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (!profile.error && profile.data) row = profile.data;
+
+    session = {
+      user: { id: userId, email: identity.email },
+      patient: null,
+      key: null,
+      email: identity.email,
+      demoKey: null,
+    };
+
+    return {
+      staff: {
+        id: userId,
+        name: (row && row.full_name) || '',
+        role: (row && row.role) || 'staff',
+        since: (row && row.created_at) || null,
+      },
+      visits: await staffVisits(),
+    };
+  }
+
+  function isMissingFunction(error) {
+    var code = error && error.code;
+    var message = String((error && error.message) || '').toLowerCase();
+    return code === 'PGRST202' || message.indexOf('could not find the function') >= 0 ||
+      message.indexOf('does not exist') >= 0 || code === '42883';
+  }
+
+  async function signOutQuietly(c) {
+    try { await c.auth.signOut(); } catch (error) { /* تجاهل */ }
+    resetSession();
+  }
+
+  /** يقرأ الزيارات وبيانات المراجع المحدودة التي تسمح بها سياسات الموظفين. */
+  async function staffVisits() {
+    if (!isConfigured()) return demoStaffVisits();
+    if (!session.user) throw apiError('NOT_FOUND');
+
+    var c = getClient();
+    var results = await Promise.all([
+      c.from(TABLES.visits).select('*').order('created_at', { ascending: false }).limit(300),
+      c.from(TABLES.staffPatients)
+        .select('user_id,doc_type,masked_doc,phone,category,birth_date,created_at')
+        .limit(500),
+    ]);
+
+    var visits = throwIfError(results[0]) || [];
+    var patients = throwIfError(results[1]) || [];
+
+    var byUser = {};
+    patients.forEach(function (patient) { byUser[patient.user_id] = patient; });
+
+    return visits.map(function (row) {
+      var patient = byUser[row.user_id] || null;
+      return {
+        id: row.id,
+        userId: row.user_id,
+        queueNumber: row.queue_number,
+        status: VISIT_STATUSES[row.status] ? row.status : 'waiting',
+        reason: row.reason || null,
+        createdAt: row.created_at,
+        patient: patient
+          ? {
+            docType: patient.doc_type,
+            masked: patient.masked_doc,
+            phone: patient.phone,
+            category: patient.category,
+            since: patient.created_at,
+          }
+          : null,
+      };
+    });
+  }
+
+  /** يحدّث حالة زيارة واحدة — الأعمدة الأخرى محمية في القاعدة. */
+  async function staffSetVisitStatus(visitId, status) {
+    if (!VISIT_STATUSES[status]) throw apiError('errGeneric');
+
+    if (!isConfigured()) return demoStaffSetStatus(visitId, status);
+    if (!session.user) throw apiError('NOT_FOUND');
+
+    var c = getClient();
+    var row = throwIfError(
+      await c.from(TABLES.visits)
+        .update({ status: status })
+        .eq('id', visitId)
+        .select('id,status')
+        .maybeSingle()
+    );
+
+    if (!row) throw apiError('CLOUD_DENIED');
+    return { id: row.id, status: row.status };
+  }
+
   // ─── الوضع التجريبي (عند غياب مفاتيح Supabase) ──────────────────────────────
   // يعمل في الذاكرة فقط لهذه الصفحة، ولا يكتب أي شيء على القرص أو localStorage.
   // الهدف إبقاء الواجهة قابلة للتجربة قبل ربط المشروع.
@@ -579,6 +848,75 @@
     return { id: id };
   }
 
+  function demoChangePin(current, next) {
+    var entry = demoEntry();
+    if (entry.pin !== current) throw apiError('WRONG_PIN');
+    entry.pin = next;
+    return { changed: true, notes: entry.data.notes.length };
+  }
+
+  async function demoStaffLogin(docType, docNumber, pin) {
+    var identity = await emailFor(docType, docNumber);
+    var entry = demo.accounts[identity.fingerprint];
+    if (!entry) throw apiError('NOT_FOUND');
+    if (entry.pin !== pin) throw apiError('INVALID_PIN');
+
+    session = {
+      user: { id: entry.account.id },
+      patient: null,
+      key: null,
+      email: null,
+      demoKey: identity.fingerprint,
+    };
+
+    return {
+      staff: { id: entry.account.id, name: '', role: 'staff', since: entry.account.createdAt },
+      visits: demoStaffVisits(),
+    };
+  }
+
+  function demoStaffVisits() {
+    var out = [];
+    Object.keys(demo.accounts).forEach(function (fingerprint) {
+      var entry = demo.accounts[fingerprint];
+      var profile = entry.data.profile || {};
+      (entry.data.visits || []).forEach(function (visit) {
+        out.push({
+          id: visit.id,
+          userId: entry.account.id,
+          queueNumber: visit.queueNumber,
+          status: visit.status || 'waiting',
+          reason: visit.reason || null,
+          createdAt: visit.createdAt,
+          patient: {
+            docType: profile.docType || entry.account.docType,
+            masked: profile.masked || entry.account.masked,
+            phone: profile.phone || '',
+            category: profile.category || 'citizen',
+            since: entry.account.createdAt,
+          },
+        });
+      });
+    });
+
+    return out.sort(function (a, b) {
+      return String(b.createdAt).localeCompare(String(a.createdAt));
+    });
+  }
+
+  function demoStaffSetStatus(visitId, status) {
+    var found = null;
+    Object.keys(demo.accounts).forEach(function (fingerprint) {
+      (demo.accounts[fingerprint].data.visits || []).forEach(function (visit) {
+        if (visit.id !== visitId) return;
+        visit.status = status;
+        found = { id: visitId, status: status };
+      });
+    });
+    if (!found) throw apiError('NOT_FOUND');
+    return found;
+  }
+
   // ─── الواجهة العامة ─────────────────────────────────────────────────────────
 
   global.UrgentCloud = {
@@ -603,5 +941,11 @@
     addNote: addNote,
     updateNote: updateNote,
     deleteNote: deleteNote,
+
+    changePin: changePin,
+
+    staffLogin: staffLogin,
+    staffVisits: staffVisits,
+    staffSetVisitStatus: staffSetVisitStatus,
   };
 })(window);

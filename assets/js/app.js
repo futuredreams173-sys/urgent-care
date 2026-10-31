@@ -200,6 +200,8 @@
     kiosk: freshKiosk(),
     login: { docType: 'nid', docNo: '', pin: '', error: '', busy: false },
     portal: null,
+    staff: null,
+    staffLogin: { docType: 'nid', docNo: '', pin: '', error: '', busy: false },
   };
 
   // ─── الأجزاء المشتركة ───────────────────────────────────────────────────────
@@ -692,6 +694,9 @@
       '<a href="#/forgot" data-act="go" data-screen="forgot" style="color:var(--brand);font-size:13.5px;font-weight:600;text-decoration:underline">' + esc(t('forgotLink')) + '</a>' +
       '</p>' +
       '<p style="margin-top:16px;text-align:center;font-size:12.5px;color:var(--faint)">' + esc(t('loginHint')) + '</p>' +
+      '<div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line);text-align:center">' +
+      '<a href="#/staff" data-act="go" data-screen="staff" style="color:var(--ink-2);font-size:13px;font-weight:600;text-decoration:underline">' + esc(t('staffLink')) + '</a>' +
+      '</div>' +
       '</div></div></div></main>' +
       footer()
     );
@@ -747,6 +752,275 @@
       '</div></div></div></main>' +
       footer()
     );
+  }
+
+  // ─── لوحة الموظفين ──────────────────────────────────────────────────────────
+
+  function staffShell(inner) {
+    return (
+      '<div class="portal">' +
+      '<header class="top"><div class="wrap top__in">' + brandMarkup() +
+      '<div class="top__spacer"></div>' +
+      '<div class="top__actions">' + connectionChip() + langButton() +
+      '<button class="btn btn--sm btn--ghost" type="button" data-act="staff-logout">' + icon('logout', 'ic') + esc(t('logout')) + '</button>' +
+      '</div></div></header>' +
+      inner +
+      footer() +
+      '</div>'
+    );
+  }
+
+  function viewStaffLogin() {
+    var s = state.staffLogin;
+
+    return (
+      topbar({ hideCta: true }) +
+      '<main id="main" style="min-height:calc(100vh - var(--top-h) - 200px);display:flex;align-items:center;justify-content:center;padding:48px 0 72px">' +
+      '<div class="wrap" style="max-width:520px">' +
+      '<div class="card"><div class="card__body">' +
+      '<div style="text-align:center;margin-bottom:26px">' +
+      '<div class="success__ic" style="margin-bottom:14px">' + icon('hospital', 'ic') + '</div>' +
+      '<h1 style="font-size:1.4rem;font-weight:700;color:var(--ink)">' + esc(t('staffTitle')) + '</h1>' +
+      '<p style="margin-top:6px;color:var(--muted);font-size:14.5px">' + esc(t('staffSub')) + '</p>' +
+      '</div>' +
+      (s.error ? '<div class="notice notice--danger" style="margin-bottom:18px">' + icon('alert', 'ic') + '<div>' + esc(errText(s.error)) + '</div></div>' : '') +
+      (Cloud.isDemo ? '<div class="notice notice--warn" style="margin-bottom:18px">' + icon('info', 'ic') + '<div>' + esc(t('staffDemoWarning')) + '</div></div>' : '') +
+      '<div class="field"><label for="sfType">' + esc(t('docType')) + '</label>' +
+      '<select class="select" id="sfType">' +
+      ['nid', 'iqama', 'passport']
+        .map(function (type) {
+          return '<option value="' + type + '"' + (s.docType === type ? ' selected' : '') + '>' + esc(docLabel(type)) + '</option>';
+        })
+        .join('') +
+      '</select></div>' +
+      '<div class="field"><label for="sfDoc">' + esc(t('docNo')) + '</label>' +
+      '<input class="input input--ltr" id="sfDoc" autocomplete="username" value="' + esc(s.docNo) + '" placeholder="' + esc(t('docNoPh')) + '"></div>' +
+      '<div class="field"><label for="sfPin">' + esc(t('pin')) + '</label>' +
+      '<input class="input input--ltr" id="sfPin" type="password" autocomplete="current-password" maxlength="64" value="' + esc(s.pin) + '"></div>' +
+      '<button class="btn btn--block btn--lg" type="button" data-act="staff-login"' + (s.busy ? ' disabled' : '') + '>' +
+      esc(s.busy ? t('loading') : t('staffLoginBtn')) + '</button>' +
+      '<p style="margin-top:16px;text-align:center;font-size:12.5px;color:var(--faint)">' + esc(t('staffHint')) + '</p>' +
+      '<div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line);text-align:center">' +
+      '<a href="#/portal" data-act="go" data-screen="login" style="color:var(--ink-2);font-size:13px;font-weight:600;text-decoration:underline">' + esc(t('navPortal')) + '</a>' +
+      '</div>' +
+      '</div></div></div></main>' +
+      footer()
+    );
+  }
+
+  function staffVisitCard(visit) {
+    var patient = visit.patient || {};
+    var meta = [
+      patient.phone ? '<span dir="ltr">' + esc(formatPhone(patient.phone)) + '</span>' : '',
+      esc(t('visitQueue')) + ' ' + esc(visit.queueNumber),
+      esc(formatDate(visit.createdAt)) + ' · ' + esc(formatTime(visit.createdAt)),
+    ].filter(Boolean).join(' · ');
+
+    var statusText = t(VISIT_STATUS[visit.status] || 'stWaiting');
+    var actions = [
+      { key: 'called', label: 'staffSetCalled' },
+      { key: 'done', label: 'staffSetDone' },
+      { key: 'waiting', label: 'staffSetWaiting' },
+      { key: 'cancelled', label: 'staffSetCancelled' },
+    ].filter(function (item) { return item.key !== visit.status; })
+      .map(function (item) {
+        return '<button class="btn btn--soft btn--sm" type="button" data-act="staff-status" data-id="' + esc(visit.id) +
+          '" data-status="' + item.key + '">' + esc(t(item.label)) + '</button>';
+      })
+      .join('');
+
+    var haystack = [
+      String(visit.queueNumber || ''),
+      String(patient.masked || '').replace(/•/g, ''),
+      String(patient.phone || ''),
+      String(visit.status || ''),
+    ].join(' ');
+
+    return (
+      '<article class="card" data-staff-row data-haystack="' + esc(haystack) + '"><div class="card__body" style="padding:16px 18px">' +
+      '<div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">' +
+      '<div class="visit__q" aria-hidden="true">' + esc(visit.queueNumber === null || visit.queueNumber === undefined ? '—' : visit.queueNumber) + '</div>' +
+      '<div style="flex:1;min-width:180px">' +
+      '<b style="display:block;font-size:14.5px;color:var(--ink)">' + esc(patient.masked ? docLabel(patient.docType) + ' · ' + patient.masked : t('staffUnknownPatient')) + '</b>' +
+      '<span style="display:block;margin-top:4px;font-size:12.5px;color:var(--muted)">' + meta + '</span>' +
+      '</div>' +
+      '<span class="chip">' + esc(statusText) + '</span>' +
+      '</div>' +
+      '<div class="bar" style="justify-content:flex-start;gap:8px;flex-wrap:wrap;margin-top:12px">' + actions + '</div>' +
+      '</div></article>'
+    );
+  }
+
+  function viewStaffDashboard() {
+    var s = state.staff;
+    var visits = s.visits || [];
+    var counts = { total: visits.length, waiting: 0, called: 0, done: 0 };
+    visits.forEach(function (visit) {
+      if (Object.prototype.hasOwnProperty.call(counts, visit.status)) counts[visit.status] += 1;
+    });
+
+    var stats =
+      '<div class="portal__stats">' +
+      '<div class="stat"><span class="stat__ic">' + icon('calendar', 'ic') + '</span><div><b>' + counts.total + '</b><span>' + esc(t('staffStatTotal')) + '</span></div></div>' +
+      '<div class="stat"><span class="stat__ic">' + icon('clock', 'ic') + '</span><div><b>' + counts.waiting + '</b><span>' + esc(t('staffStatWaiting')) + '</span></div></div>' +
+      '<div class="stat"><span class="stat__ic">' + icon('user', 'ic') + '</span><div><b>' + counts.called + '</b><span>' + esc(t('staffStatCalled')) + '</span></div></div>' +
+      '<div class="stat"><span class="stat__ic">' + icon('shield', 'ic') + '</span><div><b>' + counts.done + '</b><span>' + esc(t('staffStatDone')) + '</span></div></div>' +
+      '</div>';
+
+    var list = visits.length
+      ? '<div class="grid" style="gap:12px">' + visits.map(staffVisitCard).join('') + '</div>'
+      : '<div class="empty"><div class="empty__ic">' + icon('calendar', 'ic') + '</div>' +
+        '<h2>' + esc(t('staffNoVisits')) + '</h2><p>' + esc(t('staffNoVisitsSub')) + '</p></div>';
+
+    var search =
+      '<div class="bar" style="margin:18px 0 14px;gap:10px;align-items:flex-end;flex-wrap:wrap">' +
+      '<div class="field" style="flex:1 1 240px;margin:0">' +
+      '<label for="stSearch">' + esc(t('staffSearch')) + '</label>' +
+      '<input class="input" id="stSearch" type="search" value="' + esc(s.query || '') + '" placeholder="' + esc(t('staffSearchPh')) + '">' +
+      '</div>' +
+      '<button class="btn btn--outline btn--sm" type="button" data-act="staff-refresh">' + icon('refresh', 'ic') + esc(t('staffRefresh')) + '</button>' +
+      '</div>';
+
+    return staffShell(
+      '<main id="main">' +
+      '<div class="portal__hero"><div class="wrap portal__hero-in">' +
+      '<span class="avatar" aria-hidden="true">' + icon('hospital', 'ic ic--lg') + '</span>' +
+      '<div><h1>' + esc(t('staffTitle')) + '</h1>' +
+      '<p>' + esc(s.staff.name || t('staffRoleStaff')) + ' · ' +
+      esc(t(s.staff.role === 'admin' ? 'staffRoleAdmin' : 'staffRoleStaff')) + '</p></div>' +
+      '<div class="top__spacer"></div>' +
+      '<span class="chip chip--ok"><i class="dot"></i>' + esc(t('staffBadge')) + '</span>' +
+      '</div></div>' +
+
+      '<div class="wrap">' + stats +
+      (Cloud.isDemo ? '<div class="notice notice--warn" style="margin-bottom:16px">' + icon('info', 'ic') + '<div>' + esc(t('staffDemoWarning')) + '</div></div>' : '') +
+      '<div class="notice notice--ok" style="margin-bottom:16px">' + icon('shield', 'ic') +
+      '<div><b>' + esc(t('staffNoNotesTitle')) + '</b><br>' + esc(t('staffNoNotesBody')) + '</div></div>' +
+      search +
+      '<h2 style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:12px">' + esc(t('staffVisitList')) + '</h2>' +
+      list +
+      '</div>' +
+      '</main>'
+    );
+  }
+
+  function viewStaff() {
+    return state.staff ? viewStaffDashboard() : viewStaffLogin();
+  }
+
+  function applyStaffFilter() {
+    var query = String((state.staff && state.staff.query) || '').trim().toLowerCase();
+    var rows = document.querySelectorAll('[data-staff-row]');
+    Array.prototype.forEach.call(rows, function (row) {
+      var haystack = String(row.getAttribute('data-haystack') || '').toLowerCase();
+      row.hidden = !!query && haystack.indexOf(query) < 0;
+    });
+  }
+
+  function bindStaff() {
+    if (state.staff) {
+      var search = $('#stSearch');
+      if (search) {
+        search.addEventListener('input', function () {
+          state.staff.query = search.value;
+          applyStaffFilter();
+        });
+        applyStaffFilter();
+      }
+      return;
+    }
+
+    var s = state.staffLogin;
+
+    var type = $('#sfType');
+    if (type) {
+      type.addEventListener('change', function () {
+        s.docType = type.value;
+        s.docNo = '';
+        $('#sfDoc').value = '';
+        s.error = '';
+      });
+    }
+
+    var doc = $('#sfDoc');
+    if (doc) {
+      doc.addEventListener('input', function () {
+        s.docNo = normalizeDoc(s.docType, doc.value);
+        doc.value = s.docNo;
+      });
+      doc.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') doStaffLogin();
+      });
+    }
+
+    var pin = $('#sfPin');
+    if (pin) {
+      pin.addEventListener('input', function () { s.pin = pin.value; });
+      pin.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') doStaffLogin();
+      });
+    }
+  }
+
+  async function doStaffLogin() {
+    var s = state.staffLogin;
+    if (s.busy) return;
+
+    s.error = '';
+
+    if (!s.docNo || !s.pin) {
+      s.error = 'errRequired';
+      render();
+      return;
+    }
+
+    s.busy = true;
+    render();
+
+    try {
+      var result = await Cloud.staffLogin(s.docType, s.docNo, s.pin);
+      s.busy = false;
+      s.pin = '';
+      state.portal = null;
+      state.staff = { staff: result.staff, visits: result.visits || [], query: '' };
+      state.screen = 'staff';
+      render();
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    } catch (error) {
+      s.busy = false;
+      s.error = error && error.code ? error.code : 'errGeneric';
+      render();
+    }
+  }
+
+  function refreshStaffVisits() {
+    if (!state.staff) return;
+    Cloud.staffVisits()
+      .then(function (visits) {
+        if (!state.staff) return;
+        state.staff.visits = visits || [];
+        render();
+        toast(t('staffRefreshed'), 'ok');
+      })
+      .catch(function (error) {
+        toast(errText(error && error.code ? error.code : 'errCloud'), 'err');
+      });
+  }
+
+  function updateStaffVisit(id, status) {
+    if (!state.staff) return;
+    Cloud.staffSetVisitStatus(id, status)
+      .then(function (saved) {
+        if (!state.staff) return;
+        state.staff.visits = (state.staff.visits || []).map(function (visit) {
+          return visit.id === saved.id ? Object.assign({}, visit, { status: saved.status }) : visit;
+        });
+        render();
+        toast(t('staffUpdated'), 'ok');
+      })
+      .catch(function (error) {
+        toast(errText(error && error.code ? error.code : 'errGeneric'), 'err');
+      });
   }
 
   // ─── بوابة المريض ───────────────────────────────────────────────────────────
@@ -846,7 +1120,8 @@
       '</dl>' +
       '</div></div>' +
       latestBlock +
-      '<div class="bar" style="margin-top:20px;justify-content:flex-end">' +
+      '<div class="bar" style="margin-top:20px;justify-content:flex-end;gap:10px;flex-wrap:wrap">' +
+      '<button class="btn btn--soft btn--sm" type="button" data-act="change-pin">' + icon('lock', 'ic') + esc(t('changePinBtn')) + '</button>' +
       '<button class="btn btn--outline btn--sm" type="button" data-act="export">' + icon('download', 'ic') + esc(t('exportVault')) + '</button>' +
       '</div>'
     );
@@ -943,6 +1218,7 @@
     if (state.screen === 'kiosk') app.innerHTML = viewKiosk();
     else if (state.screen === 'login') app.innerHTML = viewLogin();
     else if (state.screen === 'forgot') app.innerHTML = viewForgot();
+    else if (state.screen === 'staff') app.innerHTML = viewStaff();
     else if (state.screen === 'portal' && state.portal) app.innerHTML = viewPortal();
     else app.innerHTML = viewHome();
 
@@ -952,6 +1228,7 @@
   function bindScreen() {
     if (state.screen === 'kiosk') bindKiosk();
     else if (state.screen === 'login') bindLogin();
+    else if (state.screen === 'staff') bindStaff();
   }
 
   // ─── ربط أحداث الكشك ────────────────────────────────────────────────────────
@@ -1299,6 +1576,7 @@
 
       l.busy = false;
       l.pin = '';
+      state.staff = null;
       openPortal(session.account, session.data);
     } catch (error) {
       l.busy = false;
@@ -1399,6 +1677,73 @@
         },
       ],
     });
+  }
+
+  // ─── تغيير رمز الدخول ───────────────────────────────────────────────────────
+
+  function changePinDialog() {
+    var p = state.portal;
+    if (!p) return;
+
+    openModal({
+      title: t('changePinTitle'),
+      body:
+        '<p style="margin-bottom:14px;font-size:13.5px;color:var(--ink-2)">' + esc(t('changePinLead')) + '</p>' +
+        '<div class="notice notice--warn" style="margin-bottom:16px">' + icon('alert', 'ic') + '<div>' + esc(t('changePinWarn')) + '</div></div>' +
+        '<div class="field"><label for="cpCurrent">' + esc(t('currentPin')) + '</label>' +
+        '<input class="input input--ltr" id="cpCurrent" type="password" autocomplete="current-password" maxlength="72"></div>' +
+        '<div class="field"><label for="cpNew">' + esc(t('newPin')) + '</label>' +
+        '<input class="input input--ltr" id="cpNew" type="password" autocomplete="new-password" maxlength="72"></div>' +
+        '<div class="field"><label for="cpNew2">' + esc(t('confirmNewPin')) + '</label>' +
+        '<input class="input input--ltr" id="cpNew2" type="password" autocomplete="new-password" maxlength="72"></div>' +
+        '<div id="cpErr" hidden class="notice notice--danger" style="margin-top:12px"></div>',
+      actions: [
+        { label: t('cancel'), variant: 'btn--ghost' },
+        { label: t('save'), variant: 'btn', close: false, onClick: submitPinChange },
+      ],
+    });
+  }
+
+  function submitPinChange() {
+    var current = $('#cpCurrent') ? $('#cpCurrent').value : '';
+    var next = $('#cpNew') ? $('#cpNew').value : '';
+    var next2 = $('#cpNew2') ? $('#cpNew2').value : '';
+    var box = $('#cpErr');
+    var button = $('#modalFoot [data-modal-action="1"]');
+
+    function fail(code) {
+      if (box) {
+        box.hidden = false;
+        box.innerHTML = icon('alert', 'ic') + '<div>' + esc(errText(code)) + '</div>';
+      }
+    }
+
+    if (!current || !next) return fail('errRequired');
+    if (next.length < 6) return fail('errPinShort');
+    if (next !== next2) return fail('errPinMatch');
+    if (next === current) return fail('errPinSame');
+
+    if (box) {
+      box.hidden = true;
+      box.innerHTML = '';
+    }
+    if (button) {
+      button.disabled = true;
+      button.textContent = t('loading');
+    }
+
+    Cloud.changePin(current, next)
+      .then(function () {
+        closeModal();
+        toast(t('changePinSuccess'), 'ok');
+      })
+      .catch(function (error) {
+        if (button) {
+          button.disabled = false;
+          button.textContent = t('save');
+        }
+        fail(error && error.code ? error.code : 'errGeneric');
+      });
   }
 
   function exportVault() {
@@ -1537,6 +1882,34 @@
       state.portal = null;
       state.login = { docType: 'nid', docNo: '', pin: '', error: '', busy: false };
       go('home');
+      return;
+    }
+
+    if (act === 'staff-login') {
+      doStaffLogin();
+      return;
+    }
+
+    if (act === 'staff-logout') {
+      Cloud.logout();
+      state.staff = null;
+      state.staffLogin = { docType: 'nid', docNo: '', pin: '', error: '', busy: false };
+      go('home');
+      return;
+    }
+
+    if (act === 'staff-refresh') {
+      refreshStaffVisits();
+      return;
+    }
+
+    if (act === 'staff-status') {
+      updateStaffVisit(trigger.getAttribute('data-id'), trigger.getAttribute('data-status'));
+      return;
+    }
+
+    if (act === 'change-pin') {
+      changePinDialog();
       return;
     }
 

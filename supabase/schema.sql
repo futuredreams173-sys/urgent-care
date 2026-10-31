@@ -236,3 +236,12 @@ grant select, insert, update, delete on table public.notes    to authenticated;
 -- from pg_policies
 -- where schemaname = 'public' and tablename in ('patients', 'visits', 'notes')
 -- order by tablename, cmd;
+
+-- ============================================================================
+-- 9) لوحة الموظفين (ملف منفصل)
+--    بعد تشغيل هذا الملف، شغّل supabase/staff.sql مرة واحدة لإضافة:
+--      · جدول public.staff ودالة public.is_staff()
+--      · عرض public.staff_patients (بيانات المراجع بلا بصمة ولا ملح)
+--      · سياسات قراءة الزيارات وتحديث حالتها للموظفين
+--    ملاحظات المرضى لا تُمنح للموظفين أبداً، لأنها مشفّرة بمفتاح المريض.
+-- ============================================================================
