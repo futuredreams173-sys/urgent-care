@@ -406,7 +406,7 @@
       '</div></section>' +
 
       '<section class="section section--tint"><div class="wrap">' +
-      '<div class="section__head"><h2>' + esc(t('featTitle')) + '</h2><p>' + esc(t('featLead')) + '</p></div>' +
+      '<div class="section__head"><h2>' + esc(t('featTitle')) + '</h2></div>' +
       '<div class="grid grid--4">' +
       features
         .map(function (f) {

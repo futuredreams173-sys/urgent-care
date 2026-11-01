@@ -36,7 +36,6 @@
       showNoteSub: 'محفوظ في حسابك ولا يطّلع عليه غيرك',
 
       featTitle: 'لماذا الرعاية العاجلة؟',
-      featLead: 'تجربة تسجيل مصمّمة بمعايير المنشآت الصحية العالمية: بسيطة للمراجع، وآمنة لبياناته.',
       feat1t: 'تسجيل بلا انتظار',
       feat1d: 'ثلاث خطوات فقط لاستلام رقم الانتظار، مع تحقق فوري من صحة البيانات قبل الحفظ.',
       feat2t: 'عزل كامل للملفات',
@@ -365,7 +364,6 @@
       showNoteSub: 'Stored in your account; nobody else can access it',
 
       featTitle: 'Why Urgent Care?',
-      featLead: 'A registration experience built to global healthcare standards: simple for the patient, safe for the data.',
       feat1t: 'No waiting',
       feat1d: 'Three steps to your queue number, with instant validation before anything is stored.',
       feat2t: 'Strict isolation',
