@@ -11,27 +11,27 @@
   --brand-200: #EFC8D5;
   --brand-300: #DCA2B7;
   --brand-400: #C2748F;
-  --brand-500: #A72C52;
-  --brand-600: #8E2244;
-  --brand-700: #761A36;
-  --brand-800: #5C1229;
-  --brand-900: #400B1C;
+  --brand-500: #A2264E;
+  --brand-600: #8A1F41;
+  --brand-700: #721832;
+  --brand-800: #581026;
+  --brand-900: #3C0A1A;
 
   /* تدرّجات العلامة */
   --grad-brand: linear-gradient(135deg, var(--brand-900) 0%, var(--brand-700) 52%, var(--brand-500) 100%);
   --grad-brand-2: linear-gradient(160deg, var(--brand-600) 0%, var(--brand-900) 100%);
-  --grad-soft: linear-gradient(150deg, var(--brand-50) 0%, #fff 58%, var(--brand-100) 100%);
+  --grad-soft: linear-gradient(150deg, var(--brand-50) 0%, #FBFBFD 58%, #F0F0F4 100%);
 
   /* المحايدات — رمادي محايد يتناغم مع البورغندي */
-  --ink:      #1A1A1D;
-  --text:     #3D3D42;
-  --muted:    #6E6E76;
-  --faint:    #8C8C94;
-  --line:     #E5E5E9;
-  --line-2:   #F1F1F4;
+  --ink:      #141418;
+  --text:     #34343B;
+  --muted:    #5E5E68;
+  --faint:    #70707A;
+  --line:     #D3D3DB;
+  --line-2:   #E4E4EB;
   --surface:  #FFFFFF;
-  --page:     #F6F6F8;
-  --page-2:   #EEEEF1;
+  --page:     #E4E4EA;
+  --page-2:   #DADAE2;
 
   /* الدلالات */
   --ok:       #0E7A54;
@@ -76,8 +76,8 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(900px 520px at 100% -8%, rgba(167, 44, 82, .10) 0%, transparent 62%),
-    radial-gradient(700px 460px at -6% 106%, rgba(118, 26, 54, .06) 0%, transparent 58%),
+    radial-gradient(900px 520px at 100% -8%, rgba(162, 38, 78, .13) 0%, transparent 62%),
+    radial-gradient(700px 460px at -6% 106%, rgba(88, 16, 38, .08) 0%, transparent 58%),
     var(--page);
   background-repeat: no-repeat;
   color: var(--text);
@@ -267,7 +267,7 @@ html[dir="ltr"] .select {
 /* ---------- 7) الشريط العلوي ---------- */
 .top {
   position: sticky; top: 0; z-index: 60;
-  background: rgba(255,255,255,.82);
+  background: rgba(252, 250, 251, .93);
   backdrop-filter: saturate(180%) blur(14px);
   -webkit-backdrop-filter: saturate(180%) blur(14px);
   border-bottom: 1px solid var(--line-2);
@@ -303,16 +303,16 @@ html[dir="ltr"] .select {
 /* ---------- 8) الواجهة الترحيبية ---------- */
 .hero {
   position: relative; overflow: hidden; padding-block: 56px 72px;
-  background: linear-gradient(180deg, #FFFFFF 0%, var(--page) 100%);
+  background: linear-gradient(170deg, #F4F0F2 0%, #ECECF1 52%, var(--page) 100%);
 }
 .hero::before {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background:
-    radial-gradient(720px 400px at 90% -12%, rgba(167, 44, 82, .12), transparent 60%),
-    radial-gradient(560px 340px at 4% 108%, rgba(118, 26, 54, .07), transparent 60%);
+    radial-gradient(720px 400px at 90% -12%, rgba(162, 38, 78, .14), transparent 60%),
+    radial-gradient(560px 340px at 4% 108%, rgba(88, 16, 38, .09), transparent 60%);
 }
 .hero::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .55; z-index: 0;
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .5; z-index: 0;
   background-image: linear-gradient(var(--line-2) 1px, transparent 1px), linear-gradient(90deg, var(--line-2) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 78%);
@@ -349,9 +349,9 @@ html[dir="ltr"] .select {
 
 .hero__trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 34px; padding-top: 0; border-top: 0; }
 .trust {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 9px;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 9px;
   padding: 14px 13px; border-radius: 14px;
-  background: rgba(255, 255, 255, .72); border: 1px solid var(--line);
+  background: rgba(255, 255, 255, .86); border: 1px solid var(--line);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
 }
 .trust__ic {
@@ -374,7 +374,7 @@ html[dir="ltr"] .select {
 .app-card__head {
   display: flex; align-items: center; gap: 12px;
   padding: 18px 22px; border-bottom: 1px solid var(--line-2);
-  background: linear-gradient(180deg, #FFFFFF 0%, #F7F7F9 100%);
+  background: linear-gradient(180deg, #FDFDFE 0%, #F3F3F7 100%);
 }
 .app-card__mark {
   width: 42px; height: 42px; border-radius: 13px; flex: none;
