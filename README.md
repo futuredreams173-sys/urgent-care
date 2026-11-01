@@ -272,24 +272,20 @@ order by p.created_at desc;
 
 #### إلغاء صلاحيات الموظفين نهائياً
 
-إذا كان ملف `staff.sql` قد نُفّذ سابقاً وبقي فيه صف موظف، احذف الصفوف لتُلغى
-الصلاحية فوراً (الواجهة لم تعد تستخدمها أصلاً):
+الموقع لا يحتوي لوحة موظفين، لكن النسخ القديمة من القاعدة قد تحتوي جدول
+`public.staff` ودالة `public.is_staff()` وسياسات تسمح لحساب موظف واحد بقراءة
+كل الزيارات. لإزالتها كلها دفعة واحدة، شغّل الملف الحالي:
 
-```sql
-delete from public.staff;
+```
+supabase/staff.sql
 ```
 
-يمكن أيضاً إزالة السياسات والجدول بالكامل إن لم تعد تحتاجها:
+في: Supabase Dashboard → SQL Editor → New query → Run. يحذف الملف (بأمان وقابل
+للتكرار) سياسات الموظفين والعرض `staff_patients` والدالة `is_staff` وجدول
+`staff` بكل صفوفه، ويُبقي جداول المرضى وسياسات العزل كما هي.
 
-```sql
-drop policy if exists staff_read_visits on public.visits;
-drop policy if exists staff_update_visits on public.visits;
-drop trigger if exists visits_guard_update on public.visits;
-drop function if exists public.visits_guard_update();
-drop view if exists public.staff_patients;
-drop function if exists public.is_staff();
-drop table if exists public.staff;
-```
+بعد التنفيذ يبقى حساب الموظف السابق (إن وُجد) حساب مراجع عادياً معزولاً مثل أي
+مريض. لحذف الحساب نفسه: Authentication → Users في لوحة Supabase.
 
 ---
 
@@ -336,7 +332,7 @@ assets/js/i18n.js          القاموس عربي/إنجليزي
 assets/js/app.js           العروض والتوجيه والأحداث
 supabase/schema.sql        الجداول + الفهارس + RLS الكامل
 supabase/registered-count.sql  دالة عدد المسجّلين لأيقونة الصفحة الرئيسية
-supabase/staff.sql         اختياري/غير مستخدم: سياسات موظفين قديمة (انظر «إلغاء الصلاحيات»)
+supabase/staff.sql         إزالة صلاحيات الموظفين القديمة (شغّله مرة واحدة على قاعدة قديمة)
 server/src/app.js          تطبيق Express
 server/src/routes/         مسارات المرضى والزيارات
 server/src/validate.js     التحقق + تحويل التاريخ الهجري

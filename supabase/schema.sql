@@ -100,6 +100,11 @@ security invoker
 set search_path = ''
 as $$
 begin
+  if tg_op = 'UPDATE'
+     and new.updated_at is not null
+     and new.updated_at is distinct from old.updated_at then
+    return new;
+  end if;
   new.updated_at = now();
   return new;
 end;
@@ -119,6 +124,30 @@ drop trigger if exists notes_touch_updated_at on public.notes;
 create trigger notes_touch_updated_at
   before update on public.notes
   for each row execute function public.touch_updated_at();
+
+-- ----------------------------------------------------------------------------
+-- حماية هوية الزيارة: لا يمكن نقل زيارة إلى مريض آخر أو تغيير معرّفها
+-- ----------------------------------------------------------------------------
+create or replace function public.visits_guard_update()
+returns trigger
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+begin
+  if new.id is distinct from old.id
+     or new.user_id is distinct from old.user_id
+     or new.created_at is distinct from old.created_at then
+    raise exception 'visit identity columns are immutable' using errcode = '42501';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists visits_guard_update on public.visits;
+create trigger visits_guard_update
+  before update on public.visits
+  for each row execute function public.visits_guard_update();
 
 -- ============================================================================
 -- 6) تفعيل RLS
@@ -238,12 +267,11 @@ grant select, insert, update, delete on table public.notes    to authenticated;
 -- order by tablename, cmd;
 
 -- ============================================================================
--- 9) لوحة الموظفين (ملف منفصل)
---    بعد تشغيل هذا الملف، شغّل supabase/staff.sql مرة واحدة لإضافة:
---      · جدول public.staff ودالة public.is_staff()
---      · عرض public.staff_patients (بيانات المراجع بلا بصمة ولا ملح)
---      · سياسات قراءة الزيارات وتحديث حالتها للموظفين
---    ملاحظات المرضى لا تُمنح للموظفين أبداً، لأنها مشفّرة بمفتاح المريض.
+-- 9) الموظفون — أُزيلوا من النظام
+--    لا توجد لوحة موظفين ولا تمييز بين مستخدم وآخر: كل حساب يرى بياناته فقط.
+--    إذا كانت القاعدة قد شغّلت نسخة قديمة من supabase/staff.sql، شغّل الملف
+--    الحالي مرة واحدة لحذف جدول staff والدالة is_staff والعرض staff_patients
+--    وسياسات الموظفين على الزيارات. التنفيذ آمن ومتكرر.
 -- ============================================================================
 
 -- ============================================================================

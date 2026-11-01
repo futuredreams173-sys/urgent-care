@@ -29,14 +29,11 @@
     patients: 'patients',
     visits: 'visits',
     notes: 'notes',
-    staff: 'staff',
-    staffPatients: 'staff_patients',
   };
   var TITLE_MAX = 80;
   var BODY_MAX = 2000;
   var PIN_MIN = 6;
   var PIN_MAX = 72;
-  var VISIT_STATUSES = { waiting: 1, called: 1, done: 1, cancelled: 1 };
 
   var client = null;
   var session = { user: null, patient: null, key: null, email: null, demoKey: null };
@@ -610,177 +607,6 @@
     return { changed: true, notes: sealed.length };
   }
 
-  // ─── الموظفون ───────────────────────────────────────────────────────────────
-
-  /**
-   * دخول فريق المركز: نفس رقم الوثيقة ورمز الدخول، ثم التحقق من عضوية
-   * جدول staff على الخادم. أي حساب غير موظف يُفصل فوراً.
-   */
-  async function staffLogin(docType, docNumber, pin) {
-    if (!isConfigured()) return demoStaffLogin(docType, docNumber, pin);
-
-    var c = getClient();
-    var identity = await emailFor(docType, docNumber);
-
-    var signedIn = await c.auth.signInWithPassword({ email: identity.email, password: pin });
-    if (signedIn.error) throw mapAuthError(signedIn.error);
-    if (!signedIn.data || !signedIn.data.user) throw apiError('INVALID_PIN');
-
-    var userId = signedIn.data.user.id;
-
-    var check = await c.rpc('is_staff');
-    if (check.error) {
-      await signOutQuietly(c);
-      if (isMissingFunction(check.error)) throw apiError('STAFF_SETUP_REQUIRED');
-      throw mapDbError(check.error);
-    }
-
-    if (check.data !== true) {
-      await signOutQuietly(c);
-      throw apiError('NOT_STAFF');
-    }
-
-    var row = null;
-    var profile = await c.from(TABLES.staff)
-      .select('full_name,role,created_at')
-      .eq('user_id', userId)
-      .maybeSingle();
-    if (!profile.error && profile.data) row = profile.data;
-
-    session = {
-      user: { id: userId, email: identity.email },
-      patient: null,
-      key: null,
-      email: identity.email,
-      demoKey: null,
-    };
-
-    return {
-      staff: {
-        id: userId,
-        name: (row && row.full_name) || '',
-        role: (row && row.role) || 'staff',
-        since: (row && row.created_at) || null,
-      },
-      visits: await staffVisits(),
-      patients: await staffPatients(),
-    };
-  }
-
-  function isMissingFunction(error) {
-    var code = error && error.code;
-    var message = String((error && error.message) || '').toLowerCase();
-    return code === 'PGRST202' || message.indexOf('could not find the function') >= 0 ||
-      message.indexOf('does not exist') >= 0 || code === '42883';
-  }
-
-  async function signOutQuietly(c) {
-    try { await c.auth.signOut(); } catch (error) { /* تجاهل */ }
-    resetSession();
-  }
-
-  /** يقرأ الزيارات وبيانات المراجع المحدودة التي تسمح بها سياسات الموظفين. */
-  async function staffVisits() {
-    if (!isConfigured()) return demoStaffVisits();
-    if (!session.user) throw apiError('NOT_FOUND');
-
-    var c = getClient();
-    var results = await Promise.all([
-      c.from(TABLES.visits).select('*').order('created_at', { ascending: false }).limit(300),
-      c.from(TABLES.staffPatients)
-        .select('user_id,doc_type,masked_doc,phone,category,birth_date,created_at')
-        .limit(500),
-    ]);
-
-    var visits = throwIfError(results[0]) || [];
-    var patients = throwIfError(results[1]) || [];
-
-    var byUser = {};
-    patients.forEach(function (patient) { byUser[patient.user_id] = patient; });
-
-    return visits.map(function (row) {
-      var patient = byUser[row.user_id] || null;
-      return {
-        id: row.id,
-        userId: row.user_id,
-        queueNumber: row.queue_number,
-        status: VISIT_STATUSES[row.status] ? row.status : 'waiting',
-        reason: row.reason || null,
-        createdAt: row.created_at,
-        patient: patient
-          ? {
-            docType: patient.doc_type,
-            masked: patient.masked_doc,
-            phone: patient.phone,
-            category: patient.category,
-            since: patient.created_at,
-          }
-          : null,
-      };
-    });
-  }
-
-  /**
-   * يقرأ كل المرضى المسجّلين من العرض المحدود staff_patients
-   * (بلا بصمة الوثيقة وبلا ملح التشفير) مع عدد زيارات كل واحد.
-   */
-  async function staffPatients() {
-    if (!isConfigured()) return demoStaffPatients();
-    if (!session.user) throw apiError('NOT_FOUND');
-
-    var c = getClient();
-    var results = await Promise.all([
-      c.from(TABLES.staffPatients)
-        .select('user_id,doc_type,masked_doc,phone,category,birth_date,created_at')
-        .order('created_at', { ascending: false })
-        .limit(1000),
-      c.from(TABLES.visits)
-        .select('user_id')
-        .limit(5000),
-    ]);
-
-    var patients = throwIfError(results[0]) || [];
-    var visits = throwIfError(results[1]) || [];
-
-    var counts = {};
-    visits.forEach(function (row) {
-      counts[row.user_id] = (counts[row.user_id] || 0) + 1;
-    });
-
-    return patients.map(function (row) {
-      return {
-        userId: row.user_id,
-        docType: row.doc_type,
-        masked: row.masked_doc,
-        phone: row.phone,
-        category: row.category,
-        birthDate: row.birth_date,
-        since: row.created_at,
-        visits: counts[row.user_id] || 0,
-      };
-    });
-  }
-
-  /** يحدّث حالة زيارة واحدة — الأعمدة الأخرى محمية في القاعدة. */
-  async function staffSetVisitStatus(visitId, status) {
-    if (!VISIT_STATUSES[status]) throw apiError('errGeneric');
-
-    if (!isConfigured()) return demoStaffSetStatus(visitId, status);
-    if (!session.user) throw apiError('NOT_FOUND');
-
-    var c = getClient();
-    var row = throwIfError(
-      await c.from(TABLES.visits)
-        .update({ status: status })
-        .eq('id', visitId)
-        .select('id,status')
-        .maybeSingle()
-    );
-
-    if (!row) throw apiError('CLOUD_DENIED');
-    return { id: row.id, status: row.status };
-  }
-
   // ─── الوضع التجريبي (عند غياب مفاتيح Supabase) ──────────────────────────────
   // يعمل في الذاكرة فقط لهذه الصفحة، ولا يكتب أي شيء على القرص أو localStorage.
   // الهدف إبقاء الواجهة قابلة للتجربة قبل ربط المشروع.
@@ -919,88 +745,6 @@
     return { changed: true, notes: entry.data.notes.length };
   }
 
-  async function demoStaffLogin(docType, docNumber, pin) {
-    var identity = await emailFor(docType, docNumber);
-    var entry = demo.accounts[identity.fingerprint];
-    if (!entry) throw apiError('NOT_FOUND');
-    if (entry.pin !== pin) throw apiError('INVALID_PIN');
-
-    session = {
-      user: { id: entry.account.id },
-      patient: null,
-      key: null,
-      email: null,
-      demoKey: identity.fingerprint,
-    };
-
-    return {
-      staff: { id: entry.account.id, name: '', role: 'staff', since: entry.account.createdAt },
-      visits: demoStaffVisits(),
-      patients: demoStaffPatients(),
-    };
-  }
-
-  function demoStaffVisits() {
-    var out = [];
-    Object.keys(demo.accounts).forEach(function (fingerprint) {
-      var entry = demo.accounts[fingerprint];
-      var profile = entry.data.profile || {};
-      (entry.data.visits || []).forEach(function (visit) {
-        out.push({
-          id: visit.id,
-          userId: entry.account.id,
-          queueNumber: visit.queueNumber,
-          status: visit.status || 'waiting',
-          reason: visit.reason || null,
-          createdAt: visit.createdAt,
-          patient: {
-            docType: profile.docType || entry.account.docType,
-            masked: profile.masked || entry.account.masked,
-            phone: profile.phone || '',
-            category: profile.category || 'citizen',
-            since: entry.account.createdAt,
-          },
-        });
-      });
-    });
-
-    return out.sort(function (a, b) {
-      return String(b.createdAt).localeCompare(String(a.createdAt));
-    });
-  }
-
-  function demoStaffPatients() {
-    return Object.keys(demo.accounts).map(function (fingerprint) {
-      var entry = demo.accounts[fingerprint];
-      var profile = entry.data.profile || {};
-      return {
-        userId: entry.account.id,
-        docType: profile.docType || entry.account.docType,
-        masked: profile.masked || entry.account.masked,
-        phone: profile.phone || '',
-        category: profile.category || 'citizen',
-        birthDate: profile.birthDate || '',
-        since: entry.account.createdAt,
-        visits: (entry.data.visits || []).length,
-      };
-    }).sort(function (a, b) {
-      return String(b.since).localeCompare(String(a.since));
-    });
-  }
-
-  function demoStaffSetStatus(visitId, status) {
-    var found = null;
-    Object.keys(demo.accounts).forEach(function (fingerprint) {
-      (demo.accounts[fingerprint].data.visits || []).forEach(function (visit) {
-        if (visit.id !== visitId) return;
-        visit.status = status;
-        found = { id: visitId, status: status };
-      });
-    });
-    if (!found) throw apiError('NOT_FOUND');
-    return found;
-  }
-
   // ─── عدد المراجعين المسجّلين (رقم فقط، بلا أي بيانات شخصية) ────────────────
 
   async function registeredCount() {
@@ -1044,10 +788,5 @@
     deleteNote: deleteNote,
 
     changePin: changePin,
-
-    staffLogin: staffLogin,
-    staffVisits: staffVisits,
-    staffPatients: staffPatients,
-    staffSetVisitStatus: staffSetVisitStatus,
   };
 })(window);
