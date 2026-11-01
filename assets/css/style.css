@@ -259,6 +259,7 @@ html[dir="ltr"] .select {
 /* ---------- 6) البطاقات ---------- */
 .card {
   background: var(--surface);
+  color: var(--text);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
@@ -553,22 +554,40 @@ html[dir="ltr"] .select {
 .foot__base { margin-top: 34px; padding-top: 20px; border-top: 1px solid var(--line-2); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--faint); }
 
 /* ---------- 11) شاشة الكشك ---------- */
-.kiosk { min-height: 100vh; display: flex; flex-direction: column; background: var(--grad-soft); background-attachment: fixed; }
+.kiosk {
+  min-height: 100vh; display: flex; flex-direction: column;
+  background:
+    radial-gradient(760px 420px at 88% -10%, rgba(255, 255, 255, .10), transparent 62%),
+    radial-gradient(620px 380px at 4% 108%, rgba(0, 0, 0, .28), transparent 62%),
+    var(--grad-brand);
+  background-attachment: fixed;
+  color: #fff;
+}
 .kiosk__top { display: flex; align-items: center; gap: 16px; padding-block: 18px; }
 .kiosk__top .top__spacer { flex: 1; }
 .kiosk__body { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding-block: 18px 60px; }
 .kiosk__panel { width: 100%; max-width: 620px; }
 
+.kiosk .brand__mark { background: #fff; box-shadow: 0 8px 18px -10px rgba(0, 0, 0, .5); }
+.kiosk .brand__mark svg { stroke: var(--brand-700); }
+.kiosk .brand__name { color: #fff; }
+.kiosk .brand__tag { color: rgba(255, 255, 255, .72); }
+.kiosk .iconbtn {
+  color: #fff; background: rgba(255, 255, 255, .12);
+  border-color: rgba(255, 255, 255, .20);
+}
+.kiosk .iconbtn:hover { background: rgba(255, 255, 255, .22); color: #fff; }
+
 .kiosk__head { text-align: center; margin-bottom: 28px; }
-.kiosk__head h1 { font-size: clamp(1.5rem, 3vw, 1.95rem); font-weight: 700; color: var(--ink); letter-spacing: -.02em; }
-.kiosk__head p { margin-top: 8px; font-size: 15.5px; color: var(--muted); }
+.kiosk__head h1 { font-size: clamp(1.5rem, 3vw, 1.95rem); font-weight: 700; color: #fff; letter-spacing: -.02em; }
+.kiosk__head p { margin-top: 8px; font-size: 15.5px; color: rgba(255, 255, 255, .78); }
 
 .progress { display: flex; align-items: center; gap: 6px; margin-bottom: 22px; }
-.progress__step { flex: 1; height: 5px; border-radius: var(--r-pill); background: var(--line); transition: background .3s var(--ease); }
-.progress__step.is-done { background: var(--brand-300); }
-.progress__step.is-on { background: linear-gradient(90deg, var(--brand-700), var(--brand-500)); }
-.progress__label { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--faint); }
-.progress__label b { color: var(--brand-700); }
+.progress__step { flex: 1; height: 5px; border-radius: var(--r-pill); background: rgba(255, 255, 255, .22); transition: background .3s var(--ease); }
+.progress__step.is-done { background: rgba(255, 255, 255, .55); }
+.progress__step.is-on { background: #fff; }
+.progress__label { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, .70); }
+.progress__label b { color: #fff; }
 
 /* بطاقات الاختيار */
 .choice {
@@ -619,10 +638,18 @@ html[dir="ltr"] .select {
 .notice svg { width: 18px; height: 18px; flex: none; margin-top: 2px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ---------- 12) بوابة المريض ---------- */
-.portal { min-height: 100vh; display: flex; flex-direction: column; }
+.portal {
+  min-height: 100vh; display: flex; flex-direction: column;
+  background:
+    radial-gradient(760px 420px at 88% -10%, rgba(255, 255, 255, .10), transparent 62%),
+    radial-gradient(620px 380px at 4% 108%, rgba(0, 0, 0, .28), transparent 62%),
+    var(--grad-brand);
+  background-attachment: fixed;
+  color: #fff;
+}
 
 .portal__hero {
-  background: var(--grad-brand);
+  background: transparent;
   color: #fff; padding-block: 34px 30px; position: relative; overflow: hidden;
 }
 .portal__hero::after {
@@ -650,16 +677,30 @@ html[dir="ltr"] .select {
 .stat b { display: block; font-size: 21px; font-weight: 700; color: var(--ink); line-height: 1.2; font-variant-numeric: tabular-nums; }
 .stat span { display: block; font-size: 12.5px; color: var(--muted); margin-top: 1px; }
 
-.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-block: 28px 24px; overflow-x: auto; scrollbar-width: none; }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid rgba(255, 255, 255, .18); margin-block: 28px 24px; overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {
   position: relative; border: 0; background: none; padding: 12px 18px;
-  font-size: 14.5px; font-weight: 500; color: var(--muted); white-space: nowrap;
+  font-size: 14.5px; font-weight: 500; color: rgba(255, 255, 255, .72); white-space: nowrap;
   border-bottom: 2px solid transparent; margin-bottom: -1px;
   transition: color .16s, border-color .16s;
 }
-.tab:hover { color: var(--brand-800); }
-.tab[aria-selected="true"] { color: var(--brand-700); font-weight: 600; border-bottom-color: var(--brand-600); }
+.tab:hover { color: #fff; }
+.tab[aria-selected="true"] { color: #fff; font-weight: 600; border-bottom-color: #fff; }
+
+.portal .btn--ghost { --btn-fg: #fff; }
+.portal .btn--ghost:hover { --btn-bg: rgba(255, 255, 255, .16); --btn-fg: #fff; }
+
+/* شاشات الدخول واستعادة الرمز — الخلفية البورغندية نفسها */
+.auth {
+  background:
+    radial-gradient(760px 420px at 88% -10%, rgba(255, 255, 255, .10), transparent 62%),
+    radial-gradient(620px 380px at 4% 108%, rgba(0, 0, 0, .28), transparent 62%),
+    var(--grad-brand);
+  background-attachment: fixed;
+  color: #fff;
+}
+
 
 .panel { padding-bottom: 60px; }
 

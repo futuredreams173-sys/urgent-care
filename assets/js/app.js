@@ -375,7 +375,7 @@
     }
     var labelMarkup = labels
       .map(function (label, index) {
-        var current = index + 1 === step ? ' style="color:var(--brand-700)"' : '';
+        var current = index + 1 === step ? ' style="color:#fff;font-weight:700"' : '';
         return '<span' + current + '>' + esc(label) + '</span>';
       })
       .join('');
@@ -630,7 +630,7 @@
 
     return (
       topbar({ hideCta: true }) +
-      '<main id="main" style="min-height:calc(100vh - var(--top-h) - 200px);display:flex;align-items:center;justify-content:center;padding:48px 0 72px">' +
+      '<main id="main" class="auth" style="min-height:calc(100vh - var(--top-h));display:flex;align-items:center;justify-content:center;padding:48px 0 72px">' +
       '<div class="wrap" style="max-width:520px">' +
       '<div class="card"><div class="card__body">' +
       '<div style="text-align:center;margin-bottom:26px">' +
@@ -682,7 +682,7 @@
 
     return (
       topbar({ hideCta: true }) +
-      '<main id="main" style="min-height:calc(100vh - var(--top-h) - 200px);display:flex;align-items:center;justify-content:center;padding:48px 0 72px">' +
+      '<main id="main" class="auth" style="min-height:calc(100vh - var(--top-h));display:flex;align-items:center;justify-content:center;padding:48px 0 72px">' +
       '<div class="wrap" style="max-width:560px">' +
       '<div class="card"><div class="card__body">' +
       '<div style="text-align:center;margin-bottom:22px">' +
