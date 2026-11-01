@@ -296,8 +296,6 @@
     var opts = options || {};
     var links = [
       { key: 'home', label: t('navHome'), screen: 'home' },
-      { key: 'kiosk', label: t('navRegister'), screen: 'kiosk' },
-      { key: 'login', label: t('navPortal'), screen: 'login' },
     ];
 
     var items = links
@@ -315,9 +313,6 @@
       '<div class="top__actions">' +
       connectionChip() +
       langButton() +
-      (opts.hideCta
-        ? ''
-        : '<a class="btn btn--sm top__cta" href="#/register" data-act="go" data-screen="kiosk">' + esc(t('heroCta1')) + '</a>') +
       '<button class="iconbtn top__menu" type="button" data-act="menu" aria-label="' + esc(t('menu')) + '" aria-controls="topNav" aria-expanded="false">' + icon('menu') + '</button>' +
       '</div>' +
       '</div></header>'
@@ -374,10 +369,6 @@
       '<h1>' + esc(t('heroTitleA')) +
       (t('heroTitleEm') ? ' <em>' + esc(t('heroTitleEm')) + '</em>' : '') + '</h1>' +
       '<p class="hero__lead">' + esc(t('heroLead')) + '</p>' +
-      '<div class="hero__cta">' +
-      '<a class="btn btn--lg" href="#/register" data-act="go" data-screen="kiosk">' + icon('plus', 'ic') + esc(t('heroCta1')) + '</a>' +
-      '<a class="btn btn--lg btn--outline" href="#/portal" data-act="go" data-screen="login">' + icon('lock', 'ic') + esc(t('heroCta2')) + '</a>' +
-      '</div>' +
       '<div class="hero__trust">' +
       '<div class="trust">' + icon('clock', 'ic') + '<div><b>' + esc(t('trust1t')) + '</b><span>' + esc(t('trust1s')) + '</span></div></div>' +
       '<div class="trust">' + icon('hospital', 'ic') + '<div><b>' + esc(t('trust2t')) + '</b><span>' + esc(t('trust2s')) + '</span></div></div>' +
