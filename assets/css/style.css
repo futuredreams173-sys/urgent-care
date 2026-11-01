@@ -190,6 +190,7 @@ img { max-width: 100%; display: block; }
   padding: 13px 15px;
   min-height: 50px;
   background: #fff;
+  color: var(--ink);
   border: 1.5px solid var(--line);
   border-radius: var(--r-md);
   font-size: 16px;
@@ -267,10 +268,9 @@ html[dir="ltr"] .select {
 /* ---------- 7) الشريط العلوي ---------- */
 .top {
   position: sticky; top: 0; z-index: 60;
-  background: rgba(252, 250, 251, .93);
-  backdrop-filter: saturate(180%) blur(14px);
-  -webkit-backdrop-filter: saturate(180%) blur(14px);
-  border-bottom: 1px solid var(--line-2);
+  background: var(--grad-brand);
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: 0 10px 30px -18px rgba(0, 0, 0, .45);
 }
 .top__in {
   position: relative;
@@ -288,6 +288,19 @@ html[dir="ltr"] .select {
 .brand__name { font-size: 19px; font-weight: 700; letter-spacing: -.01em; color: var(--ink); line-height: 1.1; }
 .brand__tag { display: block; font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: .02em; }
 
+.top .brand__mark {
+  background: #fff;
+  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, .5);
+}
+.top .brand__mark svg { stroke: var(--brand-700); }
+.top .brand__name { color: #fff; }
+.top .brand__tag { color: rgba(255, 255, 255, .72); }
+.top .iconbtn {
+  color: #fff; background: rgba(255, 255, 255, .12);
+  border-color: rgba(255, 255, 255, .20);
+}
+.top .iconbtn:hover { background: rgba(255, 255, 255, .22); color: #fff; }
+
 .top__nav { display: flex; align-items: center; gap: 4px; margin-inline-start: 12px; }
 .top__link {
   padding: 9px 15px; border-radius: var(--r-sm);
@@ -303,17 +316,18 @@ html[dir="ltr"] .select {
 /* ---------- 8) الواجهة الترحيبية ---------- */
 .hero {
   position: relative; overflow: hidden; padding-block: 56px 72px;
-  background: linear-gradient(170deg, #F4F0F2 0%, #ECECF1 52%, var(--page) 100%);
+  background: var(--grad-brand);
+  color: #fff;
 }
 .hero::before {
   content: ''; position: absolute; inset: 0; pointer-events: none;
   background:
-    radial-gradient(720px 400px at 90% -12%, rgba(162, 38, 78, .14), transparent 60%),
-    radial-gradient(560px 340px at 4% 108%, rgba(88, 16, 38, .09), transparent 60%);
+    radial-gradient(760px 420px at 88% -14%, rgba(255, 255, 255, .16), transparent 62%),
+    radial-gradient(620px 380px at 4% 110%, rgba(0, 0, 0, .26), transparent 62%);
 }
 .hero::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .5; z-index: 0;
-  background-image: linear-gradient(var(--line-2) 1px, transparent 1px), linear-gradient(90deg, var(--line-2) 1px, transparent 1px);
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .35; z-index: 0;
+  background-image: linear-gradient(rgba(255,255,255,.10) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.10) 1px, transparent 1px);
   background-size: 64px 64px;
   mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 78%);
   -webkit-mask-image: radial-gradient(70% 60% at 50% 40%, #000, transparent 78%);
@@ -327,48 +341,49 @@ html[dir="ltr"] .select {
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 6px 14px 6px 10px; border-radius: var(--r-pill);
-  background: #fff; border: 1px solid var(--line);
-  font-size: 12.5px; font-weight: 600; color: var(--brand-800);
-  box-shadow: var(--sh-xs);
+  background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .22);
+  font-size: 12.5px; font-weight: 600; color: #fff;
+  box-shadow: 0 6px 18px -12px rgba(0, 0, 0, .6);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
 }
-.eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand-500); box-shadow: 0 0 0 3px rgba(167,44,82,.16); }
+.eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand-200); box-shadow: 0 0 0 3px rgba(255, 255, 255, .18); }
 
 .hero h1 {
   margin-top: 20px;
   font-size: clamp(2.1rem, 3.6vw, 3.35rem);
-  line-height: 1.22; font-weight: 700; letter-spacing: -.022em; color: var(--ink);
+  line-height: 1.22; font-weight: 700; letter-spacing: -.022em; color: #fff;
 }
-.hero h1 em { font-style: normal; color: var(--brand-700); position: relative; white-space: nowrap; }
+.hero h1 em { font-style: normal; color: var(--brand-200); position: relative; white-space: nowrap; }
 .hero h1 em::after {
   content: ''; position: absolute; inset-inline: 0; bottom: 4px; height: 9px;
-  background: linear-gradient(90deg, var(--brand-200), var(--brand-100));
+  background: rgba(255, 255, 255, .18);
   border-radius: var(--r-pill); z-index: -1;
 }
-.hero__lead { margin-top: 20px; font-size: 17.5px; line-height: 1.75; color: var(--muted); max-width: 34em; }
+.hero__lead { margin-top: 20px; font-size: 17.5px; line-height: 1.75; color: rgba(255, 255, 255, .84); max-width: 34em; }
 .hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
 
 .hero__trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 34px; padding-top: 0; border-top: 0; }
 .trust {
   display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 9px;
   padding: 14px 13px; border-radius: 14px;
-  background: rgba(255, 255, 255, .86); border: 1px solid var(--line);
+  background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .18);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
 }
 .trust__ic {
   width: 34px; height: 34px; border-radius: 10px; flex: none;
-  display: grid; place-items: center; background: var(--brand-100); color: var(--brand-700);
+  display: grid; place-items: center; background: rgba(255, 255, 255, .16); color: #fff;
 }
 .trust__ic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.trust b { display: block; font-size: 12.5px; font-weight: 700; color: var(--ink); line-height: 1.45; }
-.trust div span { display: block; font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 2px; }
+.trust b { display: block; font-size: 12.5px; font-weight: 700; color: #fff; line-height: 1.45; }
+.trust div span { display: block; font-size: 11px; color: rgba(255, 255, 255, .74); line-height: 1.5; margin-top: 2px; }
 
 /* بطاقة العرض الجانبية */
 .showcase { position: relative; }
-.showcase__glow { position: absolute; inset: -30px; background: radial-gradient(closest-side, rgba(167,44,82,.16), transparent 70%); filter: blur(10px); pointer-events: none; }
+.showcase__glow { position: absolute; inset: -30px; background: radial-gradient(closest-side, rgba(0, 0, 0, .30), transparent 70%); filter: blur(10px); pointer-events: none; }
 
 /* بطاقة الدخول — مظهر تطبيقي */
 .app-card {
-  position: relative; background: #fff; border-radius: 26px;
+  position: relative; background: #fff; border-radius: 26px; color: var(--text);
   border: 1px solid var(--line); box-shadow: var(--sh-lg); overflow: hidden;
 }
 .app-card__head {
@@ -457,7 +472,7 @@ html[dir="ltr"] .select {
 /* بطاقة الدخول المباشر في الصفحة الرئيسية */
 .entry-sub { margin: 0 0 18px; font-size: 13.5px; line-height: 1.7; color: var(--muted); }
 .entry-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: 14px; }
-.entry-links a { color: var(--brand); font-size: 13px; font-weight: 600; text-decoration: underline; }
+.entry-links a { color: var(--brand-700); font-size: 13px; font-weight: 600; text-decoration: underline; }
 .entry-note {
   display: flex; align-items: flex-start; gap: 7px;
   margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line-2);

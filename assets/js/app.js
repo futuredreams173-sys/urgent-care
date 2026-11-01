@@ -1,6 +1,6 @@
-/* ==========================================================================
-   الرعاية العاجلة — وحدة التحكم
-   العروض، التوجيه، الأحداث، وربط الواجهة بالسحابة (Supabase) أو بالخادم.
+﻿/* ==========================================================================
+   ط§ظ„ط±ط¹ط§ظٹط© ط§ظ„ط¹ط§ط¬ظ„ط© â€” ظˆط­ط¯ط© ط§ظ„طھط­ظƒظ…
+   ط§ظ„ط¹ط±ظˆط¶طŒ ط§ظ„طھظˆط¬ظٹظ‡طŒ ط§ظ„ط£ط­ط¯ط§ط«طŒ ظˆط±ط¨ط· ط§ظ„ظˆط§ط¬ظ‡ط© ط¨ط§ظ„ط³ط­ط§ط¨ط© (Supabase) ط£ظˆ ط¨ط§ظ„ط®ط§ط¯ظ….
    ========================================================================== */
 (function () {
   'use strict';
@@ -13,7 +13,7 @@
   var t = T.t;
   var errText = T.err;
 
-  // ─── أدوات مساعدة ───────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط£ط¯ظˆط§طھ ظ…ط³ط§ط¹ط¯ط© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function $(selector, root) {
     return (root || document).querySelector(selector);
@@ -31,8 +31,8 @@
 
   function toLatinDigits(value) {
     return String(value || '')
-      .replace(/[٠-٩]/g, function (d) { return String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)); })
-      .replace(/[۰-۹]/g, function (d) { return String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)); });
+      .replace(/[ظ -ظ©]/g, function (d) { return String('ظ ظ،ظ¢ظ£ظ¤ظ¥ظ¦ظ§ظ¨ظ©'.indexOf(d)); })
+      .replace(/[غ°-غ¹]/g, function (d) { return String('غ°غ±غ²غ³غ´غµغ¶غ·غ¸غ¹'.indexOf(d)); });
   }
 
   function normalizeDoc(type, raw) {
@@ -48,7 +48,7 @@
     return value;
   }
 
-  // ─── تذكّر آخر دخول (بدون رمز الدخول أبداً) ────────────────────────────────
+  // â”€â”€â”€ طھط°ظƒظ‘ط± ط¢ط®ط± ط¯ط®ظˆظ„ (ط¨ط¯ظˆظ† ط±ظ…ط² ط§ظ„ط¯ط®ظˆظ„ ط£ط¨ط¯ط§ظ‹) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   var LAST_LOGIN_KEY = 'enaya.lastLogin';
 
@@ -63,7 +63,7 @@
         })
       );
     } catch (error) {
-      /* التخزين المحلي قد يكون معطّلاً — لا نُفشل الدخول بسببه */
+      /* ط§ظ„طھط®ط²ظٹظ† ط§ظ„ظ…ط­ظ„ظٹ ظ‚ط¯ ظٹظƒظˆظ† ظ…ط¹ط·ظ‘ظ„ط§ظ‹ â€” ظ„ط§ ظ†ظڈظپط´ظ„ ط§ظ„ط¯ط®ظˆظ„ ط¨ط³ط¨ط¨ظ‡ */
     }
   }
 
@@ -101,7 +101,7 @@
     }, 3200);
   }
 
-  // ─── النافذة المنبثقة ───────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ظ†ط§ظپط°ط© ط§ظ„ظ…ظ†ط¨ط«ظ‚ط© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function openModal(options) {
     var modal = $('#modal');
@@ -138,12 +138,12 @@
     $('#modalFoot').innerHTML = '';
   }
 
-  // ─── التنسيق ────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„طھظ†ط³ظٹظ‚ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function formatDate(iso) {
-    if (!iso) return '—';
+    if (!iso) return 'â€”';
     var date = new Date(iso);
-    if (isNaN(date.getTime())) return '—';
+    if (isNaN(date.getTime())) return 'â€”';
     var locale = T.lang === 'ar' ? 'ar-SA-u-ca-gregory-nu-latn' : 'en-GB';
     try {
       return new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'long', day: 'numeric' }).format(date);
@@ -153,19 +153,19 @@
   }
 
   function formatTime(iso) {
-    if (!iso) return '—';
+    if (!iso) return 'â€”';
     var date = new Date(iso);
-    if (isNaN(date.getTime())) return '—';
+    if (isNaN(date.getTime())) return 'â€”';
     try {
       return new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit' }).format(date);
     } catch (error) {
-      return '—';
+      return 'â€”';
     }
   }
 
-  /** تاريخ ميلاد محفوظ بصيغة YYYY-MM-DD — يُعرض بالتقويم الميلادي */
+  /** طھط§ط±ظٹط® ظ…ظٹظ„ط§ط¯ ظ…ط­ظپظˆط¸ ط¨طµظٹط؛ط© YYYY-MM-DD â€” ظٹظڈط¹ط±ط¶ ط¨ط§ظ„طھظ‚ظˆظٹظ… ط§ظ„ظ…ظٹظ„ط§ط¯ظٹ */
   function formatBirthDate(value) {
-    if (!value) return '—';
+    if (!value) return 'â€”';
     var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value));
     if (!match) return String(value);
     var date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
@@ -182,12 +182,12 @@
     }
   }
 
-  /** يوحّد عرض الجوال على الصيغة المحلية 05XXXXXXXX */
+  /** ظٹظˆط­ظ‘ط¯ ط¹ط±ط¶ ط§ظ„ط¬ظˆط§ظ„ ط¹ظ„ظ‰ ط§ظ„طµظٹط؛ط© ط§ظ„ظ…ط­ظ„ظٹط© 05XXXXXXXX */
   function formatPhone(value) {
     var digits = String(value || '').replace(/\D/g, '');
     if (digits.indexOf('00966') === 0) digits = '0' + digits.slice(5);
     else if (digits.indexOf('966') === 0) digits = '0' + digits.slice(3);
-    return digits || '—';
+    return digits || 'â€”';
   }
 
   var DOC_LABEL = { nid: 'docTypeNid', iqama: 'docTypeIqama', passport: 'docTypePassport' };
@@ -214,7 +214,7 @@
 
   var VISIT_STATUS = { waiting: 'stWaiting', called: 'stCalled', done: 'stDone', cancelled: 'stCancelled' };
 
-  // ─── الحالة ─────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ط­ط§ظ„ط© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function freshKiosk() {
     return {
@@ -247,7 +247,7 @@
     portal: null,
   };
 
-  // ─── الأجزاء المشتركة ───────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ط£ط¬ط²ط§ط، ط§ظ„ظ…ط´طھط±ظƒط© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function brandMarkup() {
     return (
@@ -278,7 +278,7 @@
     );
   }
 
-  // ─── الصفحة الرئيسية ────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„طµظپط­ط© ط§ظ„ط±ط¦ظٹط³ظٹط© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function viewHome() {
     var hl = state.login;
@@ -351,7 +351,7 @@
     );
   }
 
-  // ─── الكشك: الغلاف ──────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ظƒط´ظƒ: ط§ظ„ط؛ظ„ط§ظپ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function kioskShell(inner) {
     return (
@@ -387,7 +387,7 @@
     return '<span class="field__error" id="err-' + key + '">' + (code ? esc(errText(code)) : '') + '</span>';
   }
 
-  // ─── الكشك: الخطوة 1 ────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ظƒط´ظƒ: ط§ظ„ط®ط·ظˆط© 1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function kioskStep1() {
     var choices = [
@@ -414,7 +414,7 @@
     );
   }
 
-  // ─── الكشك: الخطوة 2 ────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ظƒط´ظƒ: ط§ظ„ط®ط·ظˆط© 2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function kioskStep2() {
     var k = state.kiosk;
@@ -452,10 +452,10 @@
     );
   }
 
-  // ─── الكشك: الخطوة 3 ────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ظƒط´ظƒ: ط§ظ„ط®ط·ظˆط© 3 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   var HIJRI_MONTHS = {
-    ar: ['محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'],
+    ar: ['ظ…ط­ط±ظ…', 'طµظپط±', 'ط±ط¨ظٹط¹ ط§ظ„ط£ظˆظ„', 'ط±ط¨ظٹط¹ ط§ظ„ط¢ط®ط±', 'ط¬ظ…ط§ط¯ظ‰ ط§ظ„ط£ظˆظ„ظ‰', 'ط¬ظ…ط§ط¯ظ‰ ط§ظ„ط¢ط®ط±ط©', 'ط±ط¬ط¨', 'ط´ط¹ط¨ط§ظ†', 'ط±ظ…ط¶ط§ظ†', 'ط´ظˆط§ظ„', 'ط°ظˆ ط§ظ„ظ‚ط¹ط¯ط©', 'ط°ظˆ ط§ظ„ط­ط¬ط©'],
     en: ['Muharram', 'Safar', 'Rabi I', 'Rabi II', 'Jumada I', 'Jumada II', 'Rajab', "Sha'ban", 'Ramadan', 'Shawwal', "Dhu al-Qa'dah", 'Dhu al-Hijjah'],
   };
 
@@ -559,7 +559,7 @@
     }
   }
 
-  // ─── الكشك: الخطوة 4 ────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ظƒط´ظƒ: ط§ظ„ط®ط·ظˆط© 4 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function kioskStep4() {
     var result = state.kiosk.result;
@@ -587,7 +587,7 @@
       '<h1 style="font-size:1.5rem;font-weight:700;color:var(--ink)">' + esc(t('doneTitle')) + '</h1>' +
       '<p style="margin-top:6px;color:var(--muted);font-size:14.5px">' + esc(t('doneSub')) + '</p>' +
       '<div class="queue-hero"><div class="queue__label">' + esc(t('doneQueue')) + '</div>' +
-      '<div class="queue__num">' + esc(result.queueNumber || '—') + '</div></div>' +
+      '<div class="queue__num">' + esc(result.queueNumber || 'â€”') + '</div></div>' +
       '</div>' +
       (result.offline
         ? '<div class="notice notice--warn" style="margin-bottom:16px">' + icon('alert', 'ic') +
@@ -623,7 +623,7 @@
     return kioskShell(inner);
   }
 
-  // ─── تسجيل الدخول ───────────────────────────────────────────────────────────
+  // â”€â”€â”€ طھط³ط¬ظٹظ„ ط§ظ„ط¯ط®ظˆظ„ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function viewLogin() {
     var l = state.login;
@@ -661,23 +661,23 @@
       '<button class="btn btn--block btn--lg" type="button" data-act="login"' + (l.busy ? ' disabled' : '') + '>' +
       esc(l.busy ? t('loading') : t('loginBtn')) + '</button>' +
       '<p style="margin:14px 0 0;text-align:center">' +
-      '<a href="#/forgot" data-act="go" data-screen="forgot" style="color:var(--brand);font-size:13.5px;font-weight:600;text-decoration:underline">' + esc(t('forgotLink')) + '</a>' +
+      '<a href="#/forgot" data-act="go" data-screen="forgot" style="color:var(--brand-700);font-size:13.5px;font-weight:600;text-decoration:underline">' + esc(t('forgotLink')) + '</a>' +
       '</p>' +
       '<p style="margin:8px 0 0;text-align:center">' +
-      '<a href="#/register" data-act="start-register" style="color:var(--brand);font-size:13.5px;font-weight:600;text-decoration:underline">' + esc(t('loginNewHere')) + '</a>' +
+      '<a href="#/register" data-act="start-register" style="color:var(--brand-700);font-size:13.5px;font-weight:600;text-decoration:underline">' + esc(t('loginNewHere')) + '</a>' +
       '</p>' +
       '<p style="margin-top:16px;text-align:center;font-size:12.5px;color:var(--faint)">' + esc(t('loginHint')) + '</p>' +
       '</div></div></div></main>'
     );
   }
 
-  // ─── نسيت رمز الدخول ────────────────────────────────────────────────────────
+  // â”€â”€â”€ ظ†ط³ظٹطھ ط±ظ…ط² ط§ظ„ط¯ط®ظˆظ„ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function viewForgot() {
     var bullet = function (text) {
       return '<li style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px">' +
-        '<span style="color:var(--brand);font-weight:700;flex:none">•</span>' +
-        '<span style="font-size:14px;color:var(--ink-2)">' + esc(text) + '</span></li>';
+        '<span style="color:var(--brand-700);font-weight:700;flex:none">â€¢</span>' +
+        '<span style="font-size:14px;color:var(--text)">' + esc(text) + '</span></li>';
     };
 
     return (
@@ -703,7 +703,7 @@
       '</ul>' +
 
       '<h2 style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:10px">' + esc(t('forgotStepsTitle')) + '</h2>' +
-      '<ol style="padding-inline-start:20px;margin:0 0 18px;font-size:14px;color:var(--ink-2);line-height:1.9">' +
+      '<ol style="padding-inline-start:20px;margin:0 0 18px;font-size:14px;color:var(--text);line-height:1.9">' +
       '<li>' + esc(t('forgotStep1')) + '</li>' +
       '<li>' + esc(t('forgotStep2')) + '</li>' +
       '<li>' + esc(t('forgotStep3')) + '</li>' +
@@ -722,7 +722,7 @@
     );
   }
 
-  // ─── بوابة المراجع ──────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط¨ظˆط§ط¨ط© ط§ظ„ظ…ط±ط§ط¬ط¹ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function viewPortal() {
     var p = state.portal;
@@ -737,7 +737,7 @@
     var stats =
       '<div class="portal__stats">' +
       '<div class="stat"><span class="stat__ic">' + icon('calendar', 'ic') + '</span><div><b>' + visits.length + '</b><span>' + esc(t('statVisits')) + '</span></div></div>' +
-      '<div class="stat"><span class="stat__ic">' + icon('clock', 'ic') + '</span><div><b>' + (latest ? esc(latest.queueNumber) : '—') + '</b><span>' + esc(t('statLast')) + '</span></div></div>' +
+      '<div class="stat"><span class="stat__ic">' + icon('clock', 'ic') + '</span><div><b>' + (latest ? esc(latest.queueNumber) : 'â€”') + '</b><span>' + esc(t('statLast')) + '</span></div></div>' +
       '<div class="stat"><span class="stat__ic">' + icon('hospital', 'ic') + '</span><div><b style="font-size:15px">' +
       (latest && latest.sync && latest.sync.raqeem ? statusChip(latest.sync.raqeem.status) : statusChip('offline')) +
       '</b><span>' + esc(t('statSync')) + '</span></div></div>' +
@@ -770,8 +770,8 @@
       '<div class="portal__hero"><div class="wrap portal__hero-in">' +
       '<span class="avatar" aria-hidden="true">' + icon('user', 'ic ic--lg') + '</span>' +
       '<div><h1>' + esc(t('greeting')) + '</h1>' +
-      '<p>' + esc(docLabel(profile.docType)) + ' · <span dir="ltr">' + esc(profile.masked || '—') + '</span>' +
-      (profile.createdAt ? ' · ' + esc(t('memberSince')) + ' ' + esc(formatDate(profile.createdAt)) : '') +
+      '<p>' + esc(docLabel(profile.docType)) + ' آ· <span dir="ltr">' + esc(profile.masked || 'â€”') + '</span>' +
+      (profile.createdAt ? ' آ· ' + esc(t('memberSince')) + ' ' + esc(formatDate(profile.createdAt)) : '') +
       '</p></div>' +
       '<div class="top__spacer"></div>' +
       '</div></div>' +
@@ -788,7 +788,7 @@
   function portalOverview(profile, latest) {
     var rows = [
       { label: t('labelDocType'), value: docLabel(profile.docType) },
-      { label: t('labelDocNo'), value: '<span dir="ltr">' + esc(profile.masked || '—') + '</span>' },
+      { label: t('labelDocNo'), value: '<span dir="ltr">' + esc(profile.masked || 'â€”') + '</span>' },
       { label: t('labelDob'), value: esc(formatBirthDate(profile.birthDate)) },
       { label: t('labelPhone'), value: '<span dir="ltr">' + esc(formatPhone(profile.phone)) + '</span>' },
       { label: t('labelCategory'), value: esc(categoryLabel(profile.category)) },
@@ -797,7 +797,7 @@
 
     if (profile.insurer) {
       rows.push({ label: t('labelInsurer'), value: esc(profile.insurer) });
-      rows.push({ label: t('labelPolicy'), value: '<span dir="ltr">' + esc(profile.policyNumber || '—') + '</span>' });
+      rows.push({ label: t('labelPolicy'), value: '<span dir="ltr">' + esc(profile.policyNumber || 'â€”') + '</span>' });
     }
 
     var latestBlock = latest
@@ -838,8 +838,8 @@
       : statusChip('offline');
 
     var title = visit.reason ? esc(visit.reason) : esc(t('generalVisit'));
-    var meta = esc(t('visitQueue')) + ' ' + esc(visit.queueNumber) + ' · ' +
-      esc(formatDate(visit.createdAt)) + ' · ' + esc(formatTime(visit.createdAt));
+    var meta = esc(t('visitQueue')) + ' ' + esc(visit.queueNumber) + ' آ· ' +
+      esc(formatDate(visit.createdAt)) + ' آ· ' + esc(formatTime(visit.createdAt));
 
     return (
       '<div class="visit">' +
@@ -882,7 +882,7 @@
               '<b style="display:block;font-size:14.5px;color:var(--ink)">' + esc(note.title) + '</b>' +
               '<p style="margin-top:4px;font-size:13.5px;color:var(--muted);white-space:pre-wrap">' + esc(note.body) + '</p>' +
               '<span style="display:block;margin-top:8px;font-size:11.5px;color:var(--faint)">' + esc(formatDate(wasEdited(note) ? note.updatedAt : note.createdAt)) +
-              (wasEdited(note) ? ' · ' + esc(t('noteEdited')) : '') + '</span>' +
+              (wasEdited(note) ? ' آ· ' + esc(t('noteEdited')) : '') + '</span>' +
               '</div>' +
               '<div style="display:flex;gap:4px;flex:none">' +
               '<button class="iconbtn" type="button" data-act="edit-note" data-id="' + esc(note.id) + '" aria-label="' + esc(t('edit')) + '">' + icon('edit') + '</button>' +
@@ -906,7 +906,7 @@
     );
   }
 
-  // ─── الرسم ──────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ط±ط³ظ… â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function render() {
     document.documentElement.lang = T.lang;
@@ -924,7 +924,7 @@
     if (state.screen === 'home') loadRegCount();
   }
 
-  // ─── عدد المراجعين المسجّلين على الصفحة الرئيسية ────────────────────────────
+  // â”€â”€â”€ ط¹ط¯ط¯ ط§ظ„ظ…ط±ط§ط¬ط¹ظٹظ† ط§ظ„ظ…ط³ط¬ظ‘ظ„ظٹظ† ط¹ظ„ظ‰ ط§ظ„طµظپط­ط© ط§ظ„ط±ط¦ظٹط³ظٹط© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function loadRegCount() {
     if (typeof state.regCount === 'number') {
@@ -935,7 +935,7 @@
 
     Cloud.registeredCount().then(function (value) {
       if (typeof value !== 'number') {
-        state.regCountFailed = true; // الدالة غير منشورة بعد → تُخفى الأيقونة بلا تكرار
+        state.regCountFailed = true; // ط§ظ„ط¯ط§ظ„ط© ط؛ظٹط± ظ…ظ†ط´ظˆط±ط© ط¨ط¹ط¯ â†’ طھظڈط®ظپظ‰ ط§ظ„ط£ظٹظ‚ظˆظ†ط© ط¨ظ„ط§ طھظƒط±ط§ط±
         return;
       }
       state.regCount = value;
@@ -956,7 +956,7 @@
     else if (state.screen === 'login' || state.screen === 'home') bindLogin();
   }
 
-  // ─── ربط أحداث الكشك ────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط±ط¨ط· ط£ط­ط¯ط§ط« ط§ظ„ظƒط´ظƒ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function bindKiosk() {
     var k = state.kiosk;
@@ -1024,7 +1024,7 @@
     }
   }
 
-  // ─── ربط أحداث الدخول ───────────────────────────────────────────────────────
+  // â”€â”€â”€ ط±ط¨ط· ط£ط­ط¯ط§ط« ط§ظ„ط¯ط®ظˆظ„ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function bindLogin() {
     var l = state.login;
@@ -1070,7 +1070,7 @@
     }
   }
 
-  // ─── التنقل ─────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„طھظ†ظ‚ظ„ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function go(screen) {
     clearTimeout(autoRegisterTimer);
@@ -1083,7 +1083,7 @@
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
-  // ─── التسجيل ────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„طھط³ط¬ظٹظ„ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function buildPayload() {
     var k = state.kiosk;
@@ -1110,7 +1110,7 @@
     return payload;
   }
 
-  /** فحص محلي محدود — يُستخدم فقط عند انعدام الخادم. التحقق المرجعي على الخادم. */
+  /** ظپط­طµ ظ…ط­ظ„ظٹ ظ…ط­ط¯ظˆط¯ â€” ظٹظڈط³طھط®ط¯ظ… ظپظ‚ط· ط¹ظ†ط¯ ط§ظ†ط¹ط¯ط§ظ… ط§ظ„ط®ط§ط¯ظ…. ط§ظ„طھط­ظ‚ظ‚ ط§ظ„ظ…ط±ط¬ط¹ظٹ ط¹ظ„ظ‰ ط§ظ„ط®ط§ط¯ظ…. */
   function localCheck(payload) {
     var errors = {};
     var type = payload.documentType;
@@ -1164,8 +1164,8 @@
   }
 
   /**
-   * يحفظ التسجيل في السحابة: ينشئ حساب الدخول إن لم يكن موجوداً،
-   * ثم يرفع بيانات المريض والزيارة. يعيد الملف الكامل بعد الحفظ.
+   * ظٹط­ظپط¸ ط§ظ„طھط³ط¬ظٹظ„ ظپظٹ ط§ظ„ط³ط­ط§ط¨ط©: ظٹظ†ط´ط¦ ط­ط³ط§ط¨ ط§ظ„ط¯ط®ظˆظ„ ط¥ظ† ظ„ظ… ظٹظƒظ† ظ…ظˆط¬ظˆط¯ط§ظ‹طŒ
+   * ط«ظ… ظٹط±ظپط¹ ط¨ظٹط§ظ†ط§طھ ط§ظ„ظ…ط±ظٹط¶ ظˆط§ظ„ط²ظٹط§ط±ط©. ظٹط¹ظٹط¯ ط§ظ„ظ…ظ„ظپ ط§ظ„ظƒط§ظ…ظ„ ط¨ط¹ط¯ ط§ظ„ط­ظپط¸.
    */
   async function persistCloud(payload, patient, visit, token, mode) {
     var profile = profileFromPayload(
@@ -1240,7 +1240,7 @@
         );
 
         k.result = {
-          queueNumber: visit ? visit.queueNumber : (session.visit ? session.visit.queueNumber : '—'),
+          queueNumber: visit ? visit.queueNumber : (session.visit ? session.visit.queueNumber : 'â€”'),
           sync: visitResponse ? visitResponse.sync : {},
           offline: false,
         };
@@ -1253,7 +1253,7 @@
         return;
       }
 
-      // ─── وضع بلا خادم: رقم انتظار محلي + حفظ سحابي ───
+      // â”€â”€â”€ ظˆط¶ط¹ ط¨ظ„ط§ ط®ط§ط¯ظ…: ط±ظ‚ظ… ط§ظ†طھط¸ط§ط± ظ…ط­ظ„ظٹ + ط­ظپط¸ ط³ط­ط§ط¨ظٹ â”€â”€â”€
       var errors = localCheck(payload);
       if (Object.keys(errors).length) {
         k.errors = errors;
@@ -1293,7 +1293,7 @@
     }
   }
 
-  // ─── الدخول ─────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ط¯ط®ظˆظ„ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async function doLogin() {
     var l = state.login;
@@ -1331,8 +1331,8 @@
       var unknown = l.error === 'NOT_FOUND' || l.error === 'INVALID_PIN';
       render();
 
-      // على الصفحة الرئيسية: من فشل دخوله (غير مسجّل غالباً) يُنقل تلقائياً
-      // إلى التسجيل مع بياناته، مع إبقاء رسالة واضحة وزر رجوع للدخول.
+      // ط¹ظ„ظ‰ ط§ظ„طµظپط­ط© ط§ظ„ط±ط¦ظٹط³ظٹط©: ظ…ظ† ظپط´ظ„ ط¯ط®ظˆظ„ظ‡ (ط؛ظٹط± ظ…ط³ط¬ظ‘ظ„ ط؛ط§ظ„ط¨ط§ظ‹) ظٹظڈظ†ظ‚ظ„ طھظ„ظ‚ط§ط¦ظٹط§ظ‹
+      // ط¥ظ„ظ‰ ط§ظ„طھط³ط¬ظٹظ„ ظ…ط¹ ط¨ظٹط§ظ†ط§طھظ‡طŒ ظ…ط¹ ط¥ط¨ظ‚ط§ط، ط±ط³ط§ظ„ط© ظˆط§ط¶ط­ط© ظˆط²ط± ط±ط¬ظˆط¹ ظ„ظ„ط¯ط®ظˆظ„.
       if (unknown && state.screen === 'home') {
         clearTimeout(autoRegisterTimer);
         autoRegisterTimer = setTimeout(function () {
@@ -1370,7 +1370,7 @@
     window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
-  // ─── الملاحظات ──────────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function noteDialog(note) {
     var editing = !!note;
@@ -1457,7 +1457,7 @@
     });
   }
 
-  // ─── تغيير رمز الدخول ───────────────────────────────────────────────────────
+  // â”€â”€â”€ طھط؛ظٹظٹط± ط±ظ…ط² ط§ظ„ط¯ط®ظˆظ„ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function changePinDialog() {
     var p = state.portal;
@@ -1466,7 +1466,7 @@
     openModal({
       title: t('changePinTitle'),
       body:
-        '<p style="margin-bottom:14px;font-size:13.5px;color:var(--ink-2)">' + esc(t('changePinLead')) + '</p>' +
+        '<p style="margin-bottom:14px;font-size:13.5px;color:var(--text)">' + esc(t('changePinLead')) + '</p>' +
         '<div class="notice notice--warn" style="margin-bottom:16px">' + icon('alert', 'ic') + '<div>' + esc(t('changePinWarn')) + '</div></div>' +
         '<div class="field"><label for="cpCurrent">' + esc(t('currentPin')) + '</label>' +
         '<input class="input input--ltr" id="cpCurrent" type="password" autocomplete="current-password" maxlength="72"></div>' +
@@ -1528,7 +1528,7 @@
     var p = state.portal;
     if (!p) return;
     var record = Object.assign({}, p.data);
-    // لا نُصدّر رمز الجلسة: نسخة المستخدم تحتاج بياناته فقط، لا مفتاح دخول حيّاً.
+    // ظ„ط§ ظ†ظڈطµط¯ظ‘ط± ط±ظ…ط² ط§ظ„ط¬ظ„ط³ط©: ظ†ط³ط®ط© ط§ظ„ظ…ط³طھط®ط¯ظ… طھط­طھط§ط¬ ط¨ظٹط§ظ†ط§طھظ‡ ظپظ‚ط·طŒ ظ„ط§ ظ…ظپطھط§ط­ ط¯ط®ظˆظ„ ط­ظٹظ‘ط§ظ‹.
     delete record.token;
     var payload = {
       exportedAt: new Date().toISOString(),
@@ -1539,7 +1539,7 @@
     var url = URL.createObjectURL(blob);
     var link = document.createElement('a');
     link.href = url;
-    link.download = 'urgent-care-record-' + (p.account.masked || 'patient').replace(/•/g, '') + '.json';
+    link.download = 'urgent-care-record-' + (p.account.masked || 'patient').replace(/â€¢/g, '') + '.json';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -1547,7 +1547,7 @@
     toast(t('exported'), 'ok');
   }
 
-  // ─── الأحداث العامة ─────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ط£ط­ط¯ط§ط« ط§ظ„ط¹ط§ظ…ط© â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   document.addEventListener('click', function (event) {
     var trigger = event.target.closest('[data-act]');
@@ -1709,7 +1709,7 @@
       state.portal.tab = trigger.getAttribute('data-tab');
       render();
 
-      // جلب أحدث الملاحظات من السحابة عند فتح تبويب الملاحظات.
+      // ط¬ظ„ط¨ ط£ط­ط¯ط« ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ ظ…ظ† ط§ظ„ط³ط­ط§ط¨ط© ط¹ظ†ط¯ ظپطھط­ طھط¨ظˆظٹط¨ ط§ظ„ظ…ظ„ط§ط­ط¸ط§طھ.
       if (state.portal.tab === 'notes') {
         Cloud.refresh()
           .then(function (data) {
@@ -1749,7 +1749,7 @@
     if (!$('#modal').hidden) closeModal();
   });
 
-  // ─── الإقلاع ────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ ط§ظ„ط¥ظ‚ظ„ط§ط¹ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function boot() {
     if (!C || !C.supported()) {
@@ -1770,7 +1770,7 @@
 
     var cloudInfo = Cloud.init();
     if (cloudInfo.mode === 'demo' && window.console && window.console.info) {
-      window.console.info('[urgent-care] Supabase غير مهيّأ: يعمل التطبيق في وضع تجريبي داخل الذاكرة فقط. أضف url و anonKey في assets/js/supabase-config.js.');
+      window.console.info('[urgent-care] Supabase ط؛ظٹط± ظ…ظ‡ظٹظ‘ط£: ظٹط¹ظ…ظ„ ط§ظ„طھط·ط¨ظٹظ‚ ظپظٹ ظˆط¶ط¹ طھط¬ط±ظٹط¨ظٹ ط¯ط§ط®ظ„ ط§ظ„ط°ط§ظƒط±ط© ظپظ‚ط·. ط£ط¶ظپ url ظˆ anonKey ظپظٹ assets/js/supabase-config.js.');
     }
 
     Api.init();
