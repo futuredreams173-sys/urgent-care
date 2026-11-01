@@ -293,7 +293,8 @@
       (t('heroTitleEm') ? ' <em>' + esc(t('heroTitleEm')) + '</em>' : '') + '</h1>' +
       '<p class="hero__lead">' + esc(t('heroLead')) + '</p>' +
       '<div class="hero__trust">' +
-      '<div class="trust"><span class="trust__ic">' + icon('clock', 'ic') + '</span><div><b>' + esc(t('trust1t')) + '</b><span>' + esc(t('trust1s')) + '</span></div></div>' +
+      '<div class="trust"><span class="trust__ic">' + icon('clock', 'ic') + '</span><div><b>' + esc(t('trust1t')) + '</b>' +
+      (t('trust1s') ? '<span>' + esc(t('trust1s')) + '</span>' : '') + '</div></div>' +
       '<div class="trust"><span class="trust__ic">' + icon('hospital', 'ic') + '</span><div><b>' + esc(t('trust2t')) + '</b><span>' + esc(t('trust2s')) + '</span></div></div>' +
       '<div class="trust"><span class="trust__ic">' + icon('shield', 'ic') + '</span><div><b>' + esc(t('trust3t')) + '</b><span>' + esc(t('trust3s')) + '</span></div></div>' +
       '</div>' +
