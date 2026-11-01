@@ -323,7 +323,7 @@ npm test
 
 ```
 index.html                 واجهة الرعاية العاجلة
-assets/css/style.css       نظام التصميم البورغندي (RTL أولاً، بلا اعتماديات)
+assets/css/style.css       نظام التصميم البورغندي + الزيتي (RTL أولاً، بلا اعتماديات)
 assets/js/crypto.js        PBKDF2 + AES-GCM
 assets/js/supabase-config.js  رابط المشروع + المفتاح العام فقط
 assets/js/cloud.js         طبقة Supabase: دخول/جلب/ملاحظات

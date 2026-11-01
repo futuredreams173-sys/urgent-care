@@ -17,6 +17,18 @@
   --brand-800: #581026;
   --brand-900: #3C0A1A;
 
+  /* الزيتي — لون ثانوي مكمّل للبورغندي */
+  --olive-50:  #F6F8EC;
+  --olive-100: #EAF0D3;
+  --olive-200: #D6E0AE;
+  --olive-300: #BCCB85;
+  --olive-400: #9FB15C;
+  --olive-500: #7F8F44;
+  --olive-600: #66732F;
+  --olive-700: #4E5A21;
+  --olive-800: #3A4319;
+  --olive-900: #262C10;
+
   /* تدرّجات العلامة */
   --grad-brand: linear-gradient(135deg, var(--brand-900) 0%, var(--brand-700) 52%, var(--brand-500) 100%);
   --grad-brand-2: linear-gradient(160deg, var(--brand-600) 0%, var(--brand-900) 100%);
@@ -270,7 +282,7 @@ html[dir="ltr"] .select {
 .top {
   position: sticky; top: 0; z-index: 60;
   background: var(--grad-brand);
-  border-bottom: 1px solid rgba(255, 255, 255, .12);
+  border-bottom: 2px solid var(--olive-600);
   box-shadow: 0 10px 30px -18px rgba(0, 0, 0, .45);
 }
 .top__in {
@@ -342,12 +354,13 @@ html[dir="ltr"] .select {
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 6px 14px 6px 10px; border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .22);
+  background: linear-gradient(135deg, var(--olive-600) 0%, var(--olive-700) 100%);
+  border: 1px solid rgba(188, 203, 133, .35);
   font-size: 12.5px; font-weight: 600; color: #fff;
   box-shadow: 0 6px 18px -12px rgba(0, 0, 0, .6);
   backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
 }
-.eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--brand-200); box-shadow: 0 0 0 3px rgba(255, 255, 255, .18); }
+.eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--olive-300); box-shadow: 0 0 0 3px rgba(188, 203, 133, .24); }
 
 .hero h1 {
   margin-top: 20px;
@@ -375,6 +388,7 @@ html[dir="ltr"] .select {
   display: grid; place-items: center; background: rgba(255, 255, 255, .16); color: #fff;
 }
 .trust__ic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.trust:nth-child(2) .trust__ic { background: rgba(127, 143, 68, .34); border: 1px solid rgba(188, 203, 133, .34); color: var(--olive-100); }
 .trust b { display: block; font-size: 12.5px; font-weight: 700; color: #fff; line-height: 1.45; }
 .trust div span { display: block; font-size: 11px; color: rgba(255, 255, 255, .74); line-height: 1.5; margin-top: 2px; }
 
@@ -479,7 +493,7 @@ html[dir="ltr"] .select {
   margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line-2);
   font-size: 11.5px; line-height: 1.65; color: var(--faint);
 }
-.entry-note svg { width: 15px; height: 15px; flex: none; margin-top: 1px; color: var(--brand-500); }
+.entry-note svg { width: 15px; height: 15px; flex: none; margin-top: 1px; color: var(--olive-600); }
 .entry-note span { display: inline; }
 
 /* أيقونة عدد المراجعين المسجّلين (خارج البطاقة) */
@@ -491,7 +505,7 @@ html[dir="ltr"] .select {
   font-size: 12px; color: var(--muted); white-space: nowrap;
 }
 .reg-badge[hidden] { display: none; }
-.reg-badge svg { width: 16px; height: 16px; color: var(--brand-600); }
+.reg-badge svg { width: 16px; height: 16px; color: var(--olive-600); }
 .reg-badge b { font-size: 15px; font-weight: 700; color: var(--brand-800); font-variant-numeric: tabular-nums; }
 
 /* ---------- 9) الأقسام ---------- */
@@ -584,7 +598,7 @@ html[dir="ltr"] .select {
 
 .progress { display: flex; align-items: center; gap: 6px; margin-bottom: 22px; }
 .progress__step { flex: 1; height: 5px; border-radius: var(--r-pill); background: rgba(255, 255, 255, .22); transition: background .3s var(--ease); }
-.progress__step.is-done { background: rgba(255, 255, 255, .55); }
+.progress__step.is-done { background: var(--olive-400); }
 .progress__step.is-on { background: #fff; }
 .progress__label { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, .70); }
 .progress__label b { color: #fff; }
@@ -602,6 +616,7 @@ html[dir="ltr"] .select {
   width: 48px; height: 48px; border-radius: 14px; flex: none;
   display: grid; place-items: center; background: var(--brand-100); color: var(--brand-700);
 }
+.choice:nth-child(even) .choice__ic { background: var(--olive-50); color: var(--olive-700); }
 .choice__ic svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .choice b { display: block; font-size: 16px; font-weight: 600; color: var(--ink); }
 .choice span { display: block; font-size: 13.5px; color: var(--muted); margin-top: 2px; }
@@ -660,7 +675,9 @@ html[dir="ltr"] .select {
 .avatar {
   width: 62px; height: 62px; border-radius: 18px; flex: none;
   display: grid; place-items: center; font-size: 22px; font-weight: 700;
-  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22); color: #fff;
+  background: linear-gradient(150deg, rgba(127, 143, 68, .85) 0%, rgba(78, 90, 33, .9) 100%);
+  border: 1px solid rgba(188, 203, 133, .45); color: #fff;
+  box-shadow: 0 10px 24px -14px rgba(0, 0, 0, .65);
 }
 .portal__hero h1 { font-size: 1.42rem; font-weight: 700; letter-spacing: -.015em; }
 .portal__hero p { font-size: 13.5px; color: rgba(255,255,255,.74); margin-top: 3px; letter-spacing: .02em; }
@@ -673,6 +690,7 @@ html[dir="ltr"] .select {
   display: flex; align-items: center; gap: 14px;
 }
 .stat__ic { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--brand-50); color: var(--brand-700); flex: none; }
+.stat:nth-child(2) .stat__ic { background: var(--olive-50); color: var(--olive-700); }
 .stat__ic svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .stat b { display: block; font-size: 21px; font-weight: 700; color: var(--ink); line-height: 1.2; font-variant-numeric: tabular-nums; }
 .stat span { display: block; font-size: 12.5px; color: var(--muted); margin-top: 1px; }
@@ -686,7 +704,7 @@ html[dir="ltr"] .select {
   transition: color .16s, border-color .16s;
 }
 .tab:hover { color: #fff; }
-.tab[aria-selected="true"] { color: #fff; font-weight: 600; border-bottom-color: #fff; }
+.tab[aria-selected="true"] { color: #fff; font-weight: 600; border-bottom-color: var(--olive-300); }
 
 .portal .btn--ghost { --btn-fg: #fff; }
 .portal .btn--ghost:hover { --btn-bg: rgba(255, 255, 255, .16); --btn-fg: #fff; }
