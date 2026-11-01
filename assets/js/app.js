@@ -266,16 +266,6 @@
     );
   }
 
-  function connectionChip() {
-    if (!Cloud) {
-      return '<span class="chip chip--fail" id="connChip"><i class="dot"></i>' + esc(t('cloudOff')) + '</span>';
-    }
-    if (Cloud.isDemo) {
-      return '<span class="chip chip--warn" id="connChip" title="' + esc(t('cloudDemoHint')) + '"><i class="dot"></i>' + esc(t('cloudDemo')) + '</span>';
-    }
-    return '<span class="chip chip--ok" id="connChip"><i class="dot"></i>' + esc(t('cloudOnline')) + '</span>';
-  }
-
   function toggleMenu() {
     var nav = $('#topNav');
     var button = $('[data-act="menu"]');
@@ -311,7 +301,6 @@
       '<nav class="top__nav" id="topNav" aria-label="' + esc(t('navHome')) + '">' + items + '</nav>' +
       '<div class="top__spacer"></div>' +
       '<div class="top__actions">' +
-      connectionChip() +
       langButton() +
       '<button class="iconbtn top__menu" type="button" data-act="menu" aria-label="' + esc(t('menu')) + '" aria-controls="topNav" aria-expanded="false">' + icon('menu') + '</button>' +
       '</div>' +
@@ -462,7 +451,6 @@
       '<div class="kiosk">' +
       '<div class="wrap kiosk__top">' + brandMarkup() +
       '<div class="top__spacer"></div>' +
-      connectionChip() +
       langButton() +
       '<button class="iconbtn" type="button" data-act="home" aria-label="' + esc(t('close')) + '">' + icon('close') + '</button>' +
       '</div>' +
@@ -869,7 +857,7 @@
       '<div class="portal">' +
       '<header class="top"><div class="wrap top__in">' + brandMarkup() +
       '<div class="top__spacer"></div>' +
-      '<div class="top__actions">' + connectionChip() + langButton() +
+      '<div class="top__actions">' + langButton() +
       '<button class="btn btn--sm btn--ghost" type="button" data-act="logout">' + icon('logout', 'ic') + esc(t('logout')) + '</button>' +
       '</div></div></header>' +
 
