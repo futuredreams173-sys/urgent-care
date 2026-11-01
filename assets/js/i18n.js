@@ -133,6 +133,7 @@
       loginHint: 'ملفك محفوظ في حسابك السحابي، ولا يُفتح إلا برمز الدخول الخاص بك.',
 
       homeLoginTitle: 'دخول مباشر للمراجعين',
+      homeLoginKicker: 'دخول آمن ومشفّر',
       homeLoginSub: 'للمسجّلين سابقاً — هوية وطنية، إقامة عمالة منزلية، أو تأمين. أدخل بياناتك للوصول إلى ملفك.',
       homeLoginBtn: 'دخول',
       homeRemember: 'نحفظ آخر رقم وثيقة وجوال على هذا الجهاز لتسهيل الدخول، ولا نحفظ رمز الدخول أبداً.',
@@ -461,6 +462,7 @@
       loginHint: 'Your record lives in your cloud account and opens only with your access code.',
 
       homeLoginTitle: 'Direct visitor sign-in',
+      homeLoginKicker: 'Secure, encrypted sign-in',
       homeLoginSub: 'For returning visitors — national ID, domestic-worker iqama, or insurance. Enter your details to open your record.',
       homeLoginBtn: 'Sign in',
       homeRemember: 'We remember your last document number and mobile on this device. Your access code is never saved.',

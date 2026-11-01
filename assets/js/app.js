@@ -266,68 +266,15 @@
     );
   }
 
-  function toggleMenu() {
-    var nav = $('#topNav');
-    var button = $('[data-act="menu"]');
-    if (!nav || !button) return;
-    var open = nav.classList.toggle('is-open');
-    button.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-
-  function closeMenu() {
-    var nav = $('#topNav');
-    var button = $('[data-act="menu"]');
-    if (!nav || !button) return;
-    nav.classList.remove('is-open');
-    button.setAttribute('aria-expanded', 'false');
-  }
-
-  function topbar(options) {
-    var opts = options || {};
-    var links = [
-      { key: 'home', label: t('navHome'), screen: 'home' },
-    ];
-
-    var items = links
-      .map(function (link) {
-        var current = state.screen === link.screen ? ' aria-current="page"' : '';
-        return '<a class="top__link" href="#/' + link.key + '" data-act="go" data-screen="' + link.screen + '"' + current + '>' + esc(link.label) + '</a>';
-      })
-      .join('');
-
+  function topbar() {
     return (
       '<header class="top"><div class="wrap top__in">' +
       brandMarkup() +
-      '<nav class="top__nav" id="topNav" aria-label="' + esc(t('navHome')) + '">' + items + '</nav>' +
       '<div class="top__spacer"></div>' +
       '<div class="top__actions">' +
       langButton() +
-      '<button class="iconbtn top__menu" type="button" data-act="menu" aria-label="' + esc(t('menu')) + '" aria-controls="topNav" aria-expanded="false">' + icon('menu') + '</button>' +
       '</div>' +
       '</div></header>'
-    );
-  }
-
-  function footer() {
-    return (
-      '<footer class="foot"><div class="wrap">' +
-      '<div class="foot__in">' +
-      '<div class="foot__brand">' + brandMarkup() + '<p>' + esc(t('footAbout')) + '</p></div>' +
-      '<div class="foot__cols">' +
-      '<div class="foot__col"><p class="foot__col-h">' + esc(t('footPlatform')) + '</p>' +
-      '<a href="#/register" data-act="go" data-screen="kiosk">' + esc(t('navRegister')) + '</a>' +
-      '<a href="#/portal" data-act="go" data-screen="login">' + esc(t('navPortal')) + '</a>' +
-      '</div>' +
-      '<div class="foot__col"><p class="foot__col-h">' + esc(t('footSupport')) + '</p>' +
-      '<a href="#/" data-act="home">' + esc(t('footPrivacy')) + '</a>' +
-      '<a href="#/" data-act="home">' + esc(t('footTerms')) + '</a>' +
-      '<a href="#/" data-act="home">' + esc(t('footContact')) + '</a>' +
-      '</div>' +
-      '</div>' +
-      '</div>' +
-      '<div class="foot__base"><span>© ' + new Date().getFullYear() + ' ' + esc(t('brand')) + ' — ' + esc(t('footRights')) + '</span>' +
-      '<span>' + esc(t('footBuilt')) + '</span></div>' +
-      '</div></footer>'
     );
   }
 
@@ -336,41 +283,31 @@
   function viewHome() {
     var hl = state.login;
 
-    var features = [
-      { ic: 'clock', t: 'feat1t', d: 'feat1d' },
-      { ic: 'shield', t: 'feat2t', d: 'feat2d' },
-      { ic: 'hospital', t: 'feat3t', d: 'feat3d' },
-      { ic: 'user', t: 'feat4t', d: 'feat4d' },
-    ];
-
-    var steps = [
-      { t: 'how1t', d: 'how1d' },
-      { t: 'how2t', d: 'how2d' },
-      { t: 'how3t', d: 'how3d' },
-    ];
-
     return (
       topbar() +
-      '<main id="main">' +
+      '<main id="main" class="home">' +
       '<section class="hero"><div class="wrap hero__in">' +
-      '<div class="reveal">' +
+      '<div class="hero__copy reveal">' +
       '<span class="eyebrow"><i class="dot"></i>' + esc(t('heroBadge')) + '</span>' +
       '<h1>' + esc(t('heroTitleA')) +
       (t('heroTitleEm') ? ' <em>' + esc(t('heroTitleEm')) + '</em>' : '') + '</h1>' +
       '<p class="hero__lead">' + esc(t('heroLead')) + '</p>' +
       '<div class="hero__trust">' +
-      '<div class="trust">' + icon('clock', 'ic') + '<div><b>' + esc(t('trust1t')) + '</b><span>' + esc(t('trust1s')) + '</span></div></div>' +
-      '<div class="trust">' + icon('hospital', 'ic') + '<div><b>' + esc(t('trust2t')) + '</b><span>' + esc(t('trust2s')) + '</span></div></div>' +
-      '<div class="trust">' + icon('shield', 'ic') + '<div><b>' + esc(t('trust3t')) + '</b><span>' + esc(t('trust3s')) + '</span></div></div>' +
+      '<div class="trust"><span class="trust__ic">' + icon('clock', 'ic') + '</span><div><b>' + esc(t('trust1t')) + '</b><span>' + esc(t('trust1s')) + '</span></div></div>' +
+      '<div class="trust"><span class="trust__ic">' + icon('hospital', 'ic') + '</span><div><b>' + esc(t('trust2t')) + '</b><span>' + esc(t('trust2s')) + '</span></div></div>' +
+      '<div class="trust"><span class="trust__ic">' + icon('shield', 'ic') + '</span><div><b>' + esc(t('trust3t')) + '</b><span>' + esc(t('trust3s')) + '</span></div></div>' +
       '</div>' +
       '</div>' +
       '<div class="showcase reveal">' +
       '<div class="showcase__glow"></div>' +
       '<div class="reg-badge" id="regCount" hidden title="' + esc(t('regCountTitle')) + '">' +
       icon('user', 'ic ic--sm') + '<b>0</b><span>' + esc(t('regCountLabel')) + '</span></div>' +
-      '<div class="kiosk-card">' +
-      '<div class="kiosk-card__bar"><b>' + esc(t('homeLoginTitle')) + '</b><div class="dots"><i></i><i></i><i></i></div></div>' +
-      '<div class="kiosk-card__body">' +
+      '<div class="app-card">' +
+      '<div class="app-card__head">' +
+      '<span class="app-card__mark">' + icon('lock', 'ic') + '</span>' +
+      '<div class="app-card__titles"><b>' + esc(t('homeLoginTitle')) + '</b><span>' + esc(t('homeLoginKicker')) + '</span></div>' +
+      '</div>' +
+      '<div class="app-card__body">' +
       '<p class="entry-sub">' + esc(t('homeLoginSub')) + '</p>' +
       (hl.error
         ? '<div class="notice notice--danger" style="margin-bottom:16px">' + icon('alert', 'ic') +
@@ -379,22 +316,27 @@
           esc(t('loginStartRegister')) + '</button></div>' +
           '<div style="margin-top:8px;font-size:12px">' + esc(t('regAutoHint')) + '</div></div></div>'
         : '') +
-      '<div class="field"><label for="lgType">' + esc(t('docType')) + '</label>' +
-      '<select class="select" id="lgType">' +
+      '<div class="segmented" role="group" aria-label="' + esc(t('docType')) + '">' +
       ['nid', 'iqama', 'passport']
         .map(function (type) {
-          return '<option value="' + type + '"' + (hl.docType === type ? ' selected' : '') + '>' + esc(docLabel(type)) + '</option>';
+          return '<button class="segmented__btn' + (hl.docType === type ? ' is-on' : '') + '" type="button" ' +
+            'data-act="lg-type" data-type="' + type + '" aria-pressed="' + (hl.docType === type ? 'true' : 'false') + '">' +
+            esc(docLabel(type)) + '</button>';
         })
         .join('') +
-      '</select></div>' +
+      '</div>' +
+      '<input type="hidden" id="lgType" value="' + esc(hl.docType) + '">' +
       '<div class="field"><label for="lgDoc">' + esc(t('docNo')) + '</label>' +
-      '<input class="input input--ltr" id="lgDoc" autocomplete="username" value="' + esc(hl.docNo) + '" placeholder="' + esc(t('docNoPh')) + '"></div>' +
+      '<div class="input-wrap">' + icon('id', 'ic') +
+      '<input class="input input--icon input--ltr" id="lgDoc" autocomplete="username" value="' + esc(hl.docNo) + '" placeholder="' + esc(t('docNoPh')) + '"></div></div>' +
       '<div class="field"><label for="lgPhone">' + esc(t('phone')) + '</label>' +
-      '<input class="input input--ltr" id="lgPhone" type="tel" inputmode="numeric" maxlength="14" autocomplete="tel" value="' + esc(hl.phone) + '" placeholder="' + esc(t('phonePh')) + '"></div>' +
+      '<div class="input-wrap">' + icon('phone', 'ic') +
+      '<input class="input input--icon input--ltr" id="lgPhone" type="tel" inputmode="numeric" maxlength="14" autocomplete="tel" value="' + esc(hl.phone) + '" placeholder="' + esc(t('phonePh')) + '"></div></div>' +
       '<div class="field"><label for="lgPin">' + esc(t('pin')) + '</label>' +
-      '<input class="input input--ltr" id="lgPin" type="password" autocomplete="current-password" maxlength="64" value="' + esc(hl.pin) + '"></div>' +
-      '<button class="btn btn--block btn--lg" type="button" data-act="login"' + (hl.busy ? ' disabled' : '') + '>' +
-      icon('lock', 'ic') + esc(hl.busy ? t('loading') : t('homeLoginBtn')) + '</button>' +
+      '<div class="input-wrap">' + icon('lock', 'ic') +
+      '<input class="input input--icon input--ltr" id="lgPin" type="password" autocomplete="current-password" maxlength="64" value="' + esc(hl.pin) + '"></div></div>' +
+      '<button class="btn btn--block btn--lg btn--enter" type="button" data-act="login"' + (hl.busy ? ' disabled' : '') + '>' +
+      esc(hl.busy ? t('loading') : t('homeLoginBtn')) + icon('arrow', 'ic') + '</button>' +
       '<div class="entry-links">' +
       '<a href="#/register" data-act="start-register">' + esc(t('loginNewHere')) + '</a>' +
       '<a href="#/forgot" data-act="go" data-screen="forgot">' + esc(t('forgotLink')) + '</a>' +
@@ -404,39 +346,7 @@
       '</div>' +
       '</div>' +
       '</div></section>' +
-
-      '<section class="section section--tint"><div class="wrap">' +
-      '<div class="section__head"><h2>' + esc(t('featTitle')) + '</h2></div>' +
-      '<div class="grid grid--4">' +
-      features
-        .map(function (f) {
-          return (
-            '<article class="feature"><span class="feature__ic">' + icon(f.ic, 'ic') + '</span>' +
-            '<h3>' + esc(t(f.t)) + '</h3><p>' + esc(t(f.d)) + '</p></article>'
-          );
-        })
-        .join('') +
-      '</div></div></section>' +
-
-      '<section class="section"><div class="wrap">' +
-      '<div class="section__head"><h2>' + esc(t('howTitle')) + '</h2></div>' +
-      '<div class="steps-list">' +
-      steps
-        .map(function (s, index) {
-          return (
-            '<div class="step-card"><div class="step-card__n">' + (index + 1) + '</div>' +
-            '<h3>' + esc(t(s.t)) + '</h3><p>' + esc(t(s.d)) + '</p></div>'
-          );
-        })
-        .join('') +
-      '</div></div></section>' +
-
-      '<section class="section" style="padding-top:0"><div class="wrap">' +
-      '<div class="cta-band"><div><h2>' + esc(t('ctaTitle')) + '</h2><p>' + esc(t('ctaLead')) + '</p></div>' +
-      '<a class="btn btn--lg btn--white" href="#/register" data-act="go" data-screen="kiosk">' + esc(t('ctaBtn')) + '</a></div>' +
-      '</div></section>' +
-      '</main>' +
-      footer()
+      '</main>'
     );
   }
 
@@ -756,8 +666,7 @@
       '<a href="#/register" data-act="start-register" style="color:var(--brand);font-size:13.5px;font-weight:600;text-decoration:underline">' + esc(t('loginNewHere')) + '</a>' +
       '</p>' +
       '<p style="margin-top:16px;text-align:center;font-size:12.5px;color:var(--faint)">' + esc(t('loginHint')) + '</p>' +
-      '</div></div></div></main>' +
-      footer()
+      '</div></div></div></main>'
     );
   }
 
@@ -808,8 +717,7 @@
       '<button class="btn" type="button" style="flex:1 1 180px" data-act="go" data-screen="kiosk">' + esc(t('forgotNew')) + '</button>' +
       '<button class="btn btn--ghost" type="button" style="flex:1 1 180px" data-act="go" data-screen="login">' + esc(t('forgotBack')) + '</button>' +
       '</div>' +
-      '</div></div></div></main>' +
-      footer()
+      '</div></div></div></main>'
     );
   }
 
@@ -872,7 +780,6 @@
       '<div class="panel">' + panel + '</div>' +
       '</div>' +
       '</main>' +
-      footer() +
       '</div>'
     );
   }
@@ -1667,9 +1574,34 @@
       return;
     }
 
-    if (act === 'menu') {
+    if (act === 'lg-type') {
       event.preventDefault();
-      toggleMenu();
+      var pickedType = trigger.getAttribute('data-type');
+      if (['nid', 'iqama', 'passport'].indexOf(pickedType) < 0) return;
+
+      state.login.docType = pickedType;
+      state.login.docNo = '';
+      state.login.error = '';
+
+      var hiddenType = $('#lgType');
+      if (hiddenType) hiddenType.value = pickedType;
+      var pickedDoc = $('#lgDoc');
+      if (pickedDoc) {
+        pickedDoc.value = '';
+        pickedDoc.maxLength = pickedType === 'passport' ? 12 : 10;
+        pickedDoc.inputMode = pickedType === 'passport' ? 'text' : 'numeric';
+      }
+
+      var group = trigger.parentNode;
+      if (group) {
+        Array.prototype.forEach.call(group.querySelectorAll('[data-act="lg-type"]'), function (button) {
+          var on = button === trigger;
+          button.classList.toggle('is-on', on);
+          button.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+      }
+
+      if (pickedDoc) pickedDoc.focus();
       return;
     }
 
@@ -1814,14 +1746,6 @@
   document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') return;
     if (!$('#modal').hidden) closeModal();
-    else closeMenu();
-  });
-
-  document.addEventListener('click', function (event) {
-    var nav = $('#topNav');
-    if (!nav || !nav.classList.contains('is-open')) return;
-    if (event.target.closest('#topNav') || event.target.closest('[data-act="menu"]')) return;
-    closeMenu();
   });
 
   // ─── الإقلاع ────────────────────────────────────────────────────────────────
