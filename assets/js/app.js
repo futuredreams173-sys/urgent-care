@@ -402,10 +402,6 @@
       '<p class="entry-note">' + icon('shield', 'ic ic--sm') + esc(t('homeRemember')) + '</p>' +
       '</div>' +
       '</div>' +
-      '<div class="float-card">' +
-      '<span class="float-card__ic">' + icon('shield', 'ic') + '</span>' +
-      '<div><b>' + esc(t('showNote')) + '</b><span>' + esc(t('showNoteSub')) + '</span></div>' +
-      '</div>' +
       '</div>' +
       '</div></section>' +
 
