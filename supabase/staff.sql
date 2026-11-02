@@ -34,7 +34,15 @@ drop policy if exists staff_update_visits on public.visits;
 drop view if exists public.staff_patients;
 
 -- 3) الدالة التي تتحقق من عضوية الموظف
-drop policy if exists staff_select_self on public.staff;
+--    نتحقق من وجود الجدول أولاً: عبارة "drop policy ... on public.staff"
+--    تفشل إذا كان الجدول محذوفاً، فيتعطل الملف عند إعادة تشغيله.
+do $$
+begin
+  if to_regclass('public.staff') is not null then
+    execute 'drop policy if exists staff_select_self on public.staff';
+  end if;
+end $$;
+
 drop function if exists public.is_staff();
 
 -- 4) جدول الموظفين نفسه
